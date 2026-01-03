@@ -1,0 +1,128 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lakehouse-appkit"
+version = "0.1.0"
+description = "CLI-driven app builder and SDK for generating scalable FastAPI data applications"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Vibe Coding Team"}
+]
+keywords = ["fastapi", "databricks", "data-apps", "cli", "sdk", "lakehouse-appkit", "lakehouse"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "pydantic>=2.5.0",
+    "click>=8.1.0",
+    "jinja2>=3.1.0",
+    "pyyaml>=6.0",
+    "httpx>=0.26.0",
+    "aiohttp>=3.9.0",
+    "python-dotenv>=1.0.0",
+    "rich>=13.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.21.0",
+    "ruff>=0.1.0",
+    "mypy>=1.8.0",
+    "black>=24.0.0",
+]
+databricks = [
+    "databricks-sdk>=0.18.0",
+    "databricks-sql-connector>=3.0.0",
+]
+ai-openai = [
+    "openai>=1.0.0",
+]
+ai-claude = [
+    "anthropic>=0.18.0",
+]
+ai-gemini = [
+    "google-generativeai>=0.3.0",
+]
+ai-all = [
+    "lakehouse-appkit[ai-openai,ai-claude,ai-gemini]",
+]
+all = [
+    "lakehouse-appkit[dev,databricks,ai-all]",
+]
+
+[project.scripts]
+lakehouse-appkit = "lakehouse_appkit.cli.main:cli"
+
+[project.urls]
+Homepage = "https://github.com/databricks/lakehouse-appkit"
+Documentation = "https://lakehouse-appkit.readthedocs.io"
+Repository = "https://github.com/databricks/lakehouse-appkit"
+Issues = "https://github.com/databricks/lakehouse-appkit/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["lakehouse_appkit*"]
+exclude = ["tests*", "docs*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=lakehouse_appkit --cov-report=term-missing"
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_equality = true
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312"]
+

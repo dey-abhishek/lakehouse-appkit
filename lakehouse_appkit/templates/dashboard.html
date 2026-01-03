@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="hero">
+        <h1>Welcome to {{ app_name }}</h1>
+        <p class="subtitle">Data-powered FastAPI application</p>
+    </div>
+    
+    <div class="grid">
+        <div class="card">
+            <div class="card-header">
+                <h3>Quick Stats</h3>
+            </div>
+            <div class="card-body">
+                <div class="stat">
+                    <div class="stat-label">Total Records</div>
+                    <div class="stat-value" id="total-records">-</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Tables</div>
+                    <div class="stat-value" id="total-tables">-</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Status</div>
+                    <div class="stat-value status-healthy" id="status">Healthy</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3>Query Data</h3>
+            </div>
+            <div class="card-body">
+                <form id="query-form">
+                    <div class="form-group">
+                        <label for="query">SQL Query</label>
+                        <textarea id="query" name="query" rows="4" placeholder="SELECT * FROM table LIMIT 10"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Execute</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card" style="margin-top: 2rem;">
+        <div class="card-header">
+            <h3>Results</h3>
+        </div>
+        <div class="card-body">
+            <div id="results-container">
+                <p class="text-muted">Execute a query to see results...</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card" style="margin-top: 2rem;">
+        <div class="card-header">
+            <h3>Available Tables</h3>
+        </div>
+        <div class="card-body">
+            <div id="tables-list">
+                <p class="text-muted">Loading tables...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Load initial data
+    async function loadDashboardData() {
+        try {
+            // Load tables
+            const tablesResponse = await fetch('/api/data/tables');
+            const tables = await tablesResponse.json();
+            displayTables(tables);
+            
+            // Update stats
+            document.getElementById('total-tables').textContent = tables.length;
+            
+            // Check health
+            const healthResponse = await fetch('/api/health');
+            const health = await healthResponse.json();
+            document.getElementById('status').textContent = health.status;
+        } catch (error) {
+            console.error('Error loading dashboard data:', error);
+        }
+    }
+    
+    function displayTables(tables) {
+        const container = document.getElementById('tables-list');
+        if (tables.length === 0) {
+            container.innerHTML = '<p class="text-muted">No tables found</p>';
+            return;
+        }
+        
+        const html = '<ul class="table-list">' +
+            tables.map(table => `<li class="table-item">${table}</li>`).join('') +
+            '</ul>';
+        container.innerHTML = html;
+    }
+    
+    function displayResults(results) {
+        const container = document.getElementById('results-container');
+        
+        if (!results || results.row_count === 0) {
+            container.innerHTML = '<p class="text-muted">No results</p>';
+            return;
+        }
+        
+        // Update row count
+        document.getElementById('total-records').textContent = results.row_count;
+        
+        // Create table
+        const columns = Object.keys(results.data[0]);
+        let html = '<div class="table-responsive"><table class="results-table">';
+        
+        // Header
+        html += '<thead><tr>';
+        columns.forEach(col => {
+            html += `<th>${col}</th>`;
+        });
+        html += '</tr></thead>';
+        
+        // Body
+        html += '<tbody>';
+        results.data.forEach(row => {
+            html += '<tr>';
+            columns.forEach(col => {
+                html += `<td>${row[col] !== null ? row[col] : '<span class="text-muted">NULL</span>'}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table></div>';
+        
+        container.innerHTML = html;
+    }
+    
+    // Handle query form submission
+    document.getElementById('query-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const query = document.getElementById('query').value;
+        const resultsContainer = document.getElementById('results-container');
+        
+        resultsContainer.innerHTML = '<p class="text-muted">Executing query...</p>';
+        
+        try {
+            const response = await fetch('/api/data/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: query }),
+            });
+            
+            if (!response.ok) {
+                throw new Error('Query failed');
+            }
+            
+            const results = await response.json();
+            displayResults(results);
+        } catch (error) {
+            resultsContainer.innerHTML = `<p class="text-error">Error: ${error.message}</p>`;
+        }
+    });
+    
+    // Load data on page load
+    loadDashboardData();
+</script>
+{% endblock %}
+

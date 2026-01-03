@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unity Catalog Browser - {{ app_name }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .uc-browser {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 1rem;
+            height: calc(100vh - 200px);
+        }
+        
+        .uc-tree {
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+        
+        .uc-tree-item {
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 0.25rem;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .uc-tree-item:hover {
+            background-color: var(--background-color);
+        }
+        
+        .uc-tree-item.selected {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .uc-tree-children {
+            margin-left: 1.5rem;
+        }
+        
+        .uc-icon {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .uc-details {
+            overflow-y: auto;
+        }
+        
+        .uc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .uc-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .uc-tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .uc-tab:hover {
+            background-color: var(--background-color);
+        }
+        
+        .uc-tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .uc-tab-content {
+            display: none;
+        }
+        
+        .uc-tab-content.active {
+            display: block;
+        }
+        
+        .uc-search {
+            margin-bottom: 1rem;
+        }
+        
+        .uc-search input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+        }
+        
+        .column-list {
+            list-style: none;
+        }
+        
+        .column-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .column-item:hover {
+            background-color: var(--background-color);
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            padding: 1.5rem;
+            background: var(--background-color);
+            border-radius: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+        
+        .lineage-graph {
+            min-height: 300px;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .lineage-node {
+            padding: 1rem 1.5rem;
+            background: var(--surface-color);
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            margin: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .lineage-node.current {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-managed {
+            background: #10b981;
+            color: white;
+        }
+        
+        .badge-external {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .badge-view {
+            background: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    {% extends "base.html" %}
+    
+    {% block content %}
+    <div class="uc-browser">
+        <!-- Left sidebar - Catalog Tree -->
+        <div class="uc-tree">
+            <div class="uc-search">
+                <input 
+                    type="text" 
+                    id="tree-search" 
+                    placeholder="Search catalogs, schemas, tables..."
+                >
+            </div>
+            
+            <div id="catalog-tree">
+                <div class="text-muted">Loading catalogs...</div>
+            </div>
+        </div>
+        
+        <!-- Right panel - Details -->
+        <div class="uc-details">
+            <div class="uc-header">
+                <div>
+                    <h2 id="object-title">Select an object</h2>
+                    <p class="text-muted" id="object-subtitle"></p>
+                </div>
+                <div id="object-actions"></div>
+            </div>
+            
+            <div id="object-content">
+                <p class="text-muted">Select a table from the tree to view details</p>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+    
+    {% block scripts %}
+    <script>
+        let catalogTree = {};
+        let selectedObject = null;
+        
+        // Load catalog tree
+        async function loadCatalogTree() {
+            try {
+                const response = await fetch('/api/unity-catalog/tree');
+                const data = await response.json();
+                catalogTree = data.tree;
+                renderCatalogTree();
+            } catch (error) {
+                console.error('Error loading catalog tree:', error);
+                document.getElementById('catalog-tree').innerHTML = 
+                    '<p class="text-error">Error loading catalogs</p>';
+            }
+        }
+        
+        // Render catalog tree
+        function renderCatalogTree() {
+            const container = document.getElementById('catalog-tree');
+            container.innerHTML = '';
+            
+            Object.keys(catalogTree).forEach(catalogName => {
+                const catalog = catalogTree[catalogName];
+                const catalogEl = createTreeNode(
+                    '📁',
+                    catalogName,
+                    'catalog',
+                    { catalog: catalogName }
+                );
+                container.appendChild(catalogEl);
+                
+                // Add schemas
+                const schemasContainer = document.createElement('div');
+                schemasContainer.className = 'uc-tree-children';
+                
+                Object.keys(catalog.schemas).forEach(schemaName => {
+                    const schema = catalog.schemas[schemaName];
+                    const schemaEl = createTreeNode(
+                        '📂',
+                        schemaName,
+                        'schema',
+                        { catalog: catalogName, schema: schemaName }
+                    );
+                    schemasContainer.appendChild(schemaEl);
+                    
+                    // Add tables
+                    const tablesContainer = document.createElement('div');
+                    tablesContainer.className = 'uc-tree-children';
+                    
+                    schema.tables.forEach(table => {
+                        const tableEl = createTreeNode(
+                            '📊',
+                            table.name,
+                            'table',
+                            { 
+                                catalog: catalogName,
+                                schema: schemaName,
+                                table: table.name
+                            }
+                        );
+                        tablesContainer.appendChild(tableEl);
+                    });
+                    
+                    schemaEl.appendChild(tablesContainer);
+                });
+                
+                catalogEl.appendChild(schemasContainer);
+            });
+        }
+        
+        // Create tree node
+        function createTreeNode(icon, name, type, data) {
+            const node = document.createElement('div');
+            node.className = 'uc-tree-item';
+            node.innerHTML = `<span class="uc-icon">${icon}</span><span>${name}</span>`;
+            
+            node.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectObject(type, data);
+            });
+            
+            return node;
+        }
+        
+        // Select object and load details
+        async function selectObject(type, data) {
+            selectedObject = { type, ...data };
+            
+            // Update UI
+            document.querySelectorAll('.uc-tree-item').forEach(el => {
+                el.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            if (type === 'table') {
+                await loadTableDetails(data.catalog, data.schema, data.table);
+            }
+        }
+        
+        // Load table details
+        async function loadTableDetails(catalog, schema, table) {
+            const title = document.getElementById('object-title');
+            const subtitle = document.getElementById('object-subtitle');
+            const content = document.getElementById('object-content');
+            
+            title.textContent = table;
+            subtitle.textContent = `${catalog}.${schema}`;
+            content.innerHTML = '<p class="text-muted">Loading table details...</p>';
+            
+            try {
+                const response = await fetch(
+                    `/api/unity-catalog/catalogs/${catalog}/schemas/${schema}/tables/${table}`
+                );
+                const tableData = await response.json();
+                
+                renderTableDetails(tableData, catalog, schema, table);
+            } catch (error) {
+                console.error('Error loading table details:', error);
+                content.innerHTML = '<p class="text-error">Error loading table details</p>';
+            }
+        }
+        
+        // Render table details with tabs
+        function renderTableDetails(tableData, catalog, schema, table) {
+            const content = document.getElementById('object-content');
+            
+            const tableType = tableData.table_type || 'MANAGED';
+            const badgeClass = tableType === 'MANAGED' ? 'badge-managed' :
+                              tableType === 'VIEW' ? 'badge-view' : 'badge-external';
+            
+            content.innerHTML = `
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Table Type</div>
+                        <div class="stat-value">
+                            <span class="badge ${badgeClass}">${tableType}</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Columns</div>
+                        <div class="stat-value">${tableData.columns.length}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Owner</div>
+                        <div class="stat-value" style="font-size: 1.25rem;">
+                            ${tableData.owner || 'Unknown'}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="uc-tabs">
+                    <div class="uc-tab active" data-tab="schema">Schema</div>
+                    <div class="uc-tab" data-tab="sample">Sample Data</div>
+                    <div class="uc-tab" data-tab="stats">Statistics</div>
+                    <div class="uc-tab" data-tab="lineage">Lineage</div>
+                    <div class="uc-tab" data-tab="permissions">Permissions</div>
+                </div>
+                
+                <div id="tab-schema" class="uc-tab-content active">
+                    <h3>Columns</h3>
+                    <ul class="column-list">
+                        <li class="column-item" style="font-weight: 600;">
+                            <span>Name</span>
+                            <span>Type</span>
+                            <span>Nullable</span>
+                            <span>Comment</span>
+                        </li>
+                        ${tableData.columns.map(col => `
+                            <li class="column-item">
+                                <span>${col.name}</span>
+                                <span><code>${col.type_name}</code></span>
+                                <span>${col.nullable ? 'Yes' : 'No'}</span>
+                                <span class="text-muted">${col.comment || '-'}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+                
+                <div id="tab-sample" class="uc-tab-content"></div>
+                <div id="tab-stats" class="uc-tab-content"></div>
+                <div id="tab-lineage" class="uc-tab-content"></div>
+                <div id="tab-permissions" class="uc-tab-content"></div>
+            `;
+            
+            // Tab switching
+            document.querySelectorAll('.uc-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    
+                    // Update active tab
+                    document.querySelectorAll('.uc-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Show content
+                    document.querySelectorAll('.uc-tab-content').forEach(c => c.classList.remove('active'));
+                    document.getElementById(`tab-${tabName}`).classList.add('active');
+                    
+                    // Load content if needed
+                    if (tabName === 'sample') {
+                        loadTableSample(catalog, schema, table);
+                    } else if (tabName === 'stats') {
+                        loadTableStats(catalog, schema, table);
+                    } else if (tabName === 'lineage') {
+                        loadTableLineage(catalog, schema, table);
+                    } else if (tabName === 'permissions') {
+                        loadTablePermissions(catalog, schema, table);
+                    }
+                });
+            });
+        }
+        
+        // Load table sample
+        async function loadTableSample(catalog, schema, table) {
+            const container = document.getElementById('tab-sample');
+            container.innerHTML = '<p class="text-muted">Loading sample data...</p>';
+            
+            try {
+                const response = await fetch(
+                    `/api/unity-catalog/catalogs/${catalog}/schemas/${schema}/tables/${table}/sample?limit=10`
+                );
+                const data = await response.json();
+                
+                if (data.data.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No data in table</p>';
+                    return;
+                }
+                
+                // Render table
+                const columns = Object.keys(data.data[0]);
+                container.innerHTML = `
+                    <div class="table-responsive">
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    ${columns.map(col => `<th>${col}</th>`).join('')}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.data.map(row => `
+                                    <tr>
+                                        ${columns.map(col => `<td>${row[col] !== null ? row[col] : '<span class="text-muted">NULL</span>'}</td>`).join('')}
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-muted" style="margin-top: 1rem;">Showing ${data.row_count} sample rows</p>
+                `;
+            } catch (error) {
+                container.innerHTML = '<p class="text-error">Error loading sample data</p>';
+            }
+        }
+        
+        // Load table stats
+        async function loadTableStats(catalog, schema, table) {
+            const container = document.getElementById('tab-stats');
+            container.innerHTML = '<p class="text-muted">Loading statistics...</p>';
+            
+            try {
+                const response = await fetch(
+                    `/api/unity-catalog/catalogs/${catalog}/schemas/${schema}/tables/${table}/stats`
+                );
+                const stats = await response.json();
+                
+                container.innerHTML = `
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Rows</div>
+                            <div class="stat-value">${stats.row_count !== null ? stats.row_count.toLocaleString() : 'Unknown'}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Columns</div>
+                            <div class="stat-value">${stats.column_count}</div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                container.innerHTML = '<p class="text-error">Error loading statistics</p>';
+            }
+        }
+        
+        // Load table lineage
+        async function loadTableLineage(catalog, schema, table) {
+            const container = document.getElementById('tab-lineage');
+            container.innerHTML = '<p class="text-muted">Loading lineage...</p>';
+            
+            try {
+                const response = await fetch(
+                    `/api/unity-catalog/catalogs/${catalog}/schemas/${schema}/tables/${table}/lineage`
+                );
+                const lineage = await response.json();
+                
+                container.innerHTML = `
+                    <div class="lineage-graph">
+                        ${lineage.upstream.length > 0 ? `
+                            <h4>Upstream Dependencies</h4>
+                            ${lineage.upstream.map(t => `<div class="lineage-node">${t}</div>`).join('')}
+                            <div style="margin: 1rem;">↓</div>
+                        ` : ''}
+                        
+                        <div class="lineage-node current">${lineage.object_name}</div>
+                        
+                        ${lineage.downstream.length > 0 ? `
+                            <div style="margin: 1rem;">↓</div>
+                            <h4>Downstream Dependencies</h4>
+                            ${lineage.downstream.map(t => `<div class="lineage-node">${t}</div>`).join('')}
+                        ` : ''}
+                        
+                        ${lineage.upstream.length === 0 && lineage.downstream.length === 0 ? 
+                            '<p class="text-muted">No lineage information available</p>' : ''}
+                    </div>
+                `;
+            } catch (error) {
+                container.innerHTML = '<p class="text-error">Error loading lineage</p>';
+            }
+        }
+        
+        // Load table permissions
+        async function loadTablePermissions(catalog, schema, table) {
+            const container = document.getElementById('tab-permissions');
+            container.innerHTML = '<p class="text-muted">Loading permissions...</p>';
+            
+            try {
+                const response = await fetch(
+                    `/api/unity-catalog/catalogs/${catalog}/schemas/${schema}/tables/${table}/permissions`
+                );
+                const data = await response.json();
+                
+                if (data.permissions.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No permission information available</p>';
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <ul class="column-list">
+                        <li class="column-item" style="font-weight: 600;">
+                            <span>Principal</span>
+                            <span>Privileges</span>
+                        </li>
+                        ${data.permissions.map(perm => `
+                            <li class="column-item">
+                                <span>${perm.principal}</span>
+                                <span>${perm.privileges.join(', ')}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+            } catch (error) {
+                container.innerHTML = '<p class="text-muted">Permission information not available</p>';
+            }
+        }
+        
+        // Search functionality
+        document.getElementById('tree-search').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            document.querySelectorAll('.uc-tree-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm) || searchTerm === '') {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+        
+        // Load on page load
+        loadCatalogTree();
+    </script>
+    {% endblock %}
+</body>
+</html>
+

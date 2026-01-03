@@ -1,0 +1,352 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.2, pytest-9.0.2, pluggy-1.6.0 -- /Users/abhishek.dey/lakehouse-appkit/lakehouse-app/bin/python3.14
+cachedir: .pytest_cache
+rootdir: /Users/abhishek.dey/lakehouse-appkit
+configfile: pyproject.toml
+plugins: anyio-4.12.0, asyncio-0.21.1, cov-7.0.0
+asyncio: mode=Mode.AUTO
+collecting ... collected 105 items
+
+tests/test_adapters.py::TestDatabricksAdapterUnit::test_adapter_initialization PASSED [  0%]
+tests/test_adapters.py::TestDatabricksAdapterUnit::test_adapter_initialization_no_warehouse PASSED [  1%]
+tests/test_adapters.py::TestDatabricksAdapterUnit::test_execute_query_mock PASSED [  2%]
+tests/test_adapters.py::TestDatabricksAdapterIntegration::test_connection FAILED [  3%]
+tests/test_adapters.py::TestDatabricksAdapterIntegration::test_execute_query_integration FAILED [  4%]
+tests/test_adapters.py::TestDatabricksAdapterIntegration::test_query_with_parameters FAILED [  5%]
+tests/test_adapters.py::TestDatabricksAdapterIntegration::test_large_result_set SKIPPED [  6%]
+tests/test_ai_scaffolding.py::TestAIProviders::test_template_provider PASSED [  7%]
+tests/test_ai_scaffolding.py::TestAIProviders::test_openai_provider SKIPPED [  8%]
+tests/test_ai_scaffolding.py::TestAIProviders::test_claude_provider SKIPPED [  9%]
+tests/test_ai_scaffolding.py::TestAIProviders::test_gemini_provider SKIPPED [ 10%]
+tests/test_ai_scaffolding.py::TestAIProviders::test_invalid_provider PASSED [ 11%]
+tests/test_ai_scaffolding.py::TestTemplateProvider::test_generate_endpoint_template FAILED [ 12%]
+tests/test_ai_scaffolding.py::TestTemplateProvider::test_generate_model_template FAILED [ 13%]
+tests/test_ai_scaffolding.py::TestTemplateProvider::test_generate_service_template FAILED [ 14%]
+tests/test_ai_scaffolding.py::TestAIScaffolder::test_scaffolder_initialization FAILED [ 15%]
+tests/test_ai_scaffolding.py::TestAIScaffolder::test_generate_endpoint FAILED [ 16%]
+tests/test_ai_scaffolding.py::TestAIScaffolder::test_generate_model FAILED [ 17%]
+tests/test_ai_scaffolding.py::TestAIScaffolder::test_generate_service FAILED [ 18%]
+tests/test_ai_scaffolding.py::TestAIScaffolder::test_code_validation FAILED [ 19%]
+tests/test_ai_scaffolding.py::TestAIProvidersIntegration::test_openai_generation SKIPPED [ 20%]
+tests/test_ai_scaffolding.py::TestAIProvidersIntegration::test_claude_generation SKIPPED [ 20%]
+tests/test_ai_scaffolding.py::TestAIProvidersIntegration::test_gemini_generation SKIPPED [ 21%]
+tests/test_ai_scaffolding.py::TestAISafety::test_forbidden_patterns FAILED [ 22%]
+tests/test_ai_scaffolding.py::TestAISafety::test_code_length_limits FAILED [ 23%]
+tests/test_ai_scaffolding.py::TestAISafety::test_safe_code_patterns FAILED [ 24%]
+tests/test_auth.py::TestAuthContext::test_auth_context_creation PASSED   [ 25%]
+tests/test_auth.py::TestAuthContext::test_has_role PASSED                [ 26%]
+tests/test_auth.py::TestAuthContext::test_has_permission PASSED          [ 27%]
+tests/test_auth.py::TestAuthContext::test_has_any_role PASSED            [ 28%]
+tests/test_auth.py::TestAuthContext::test_has_all_permissions PASSED     [ 29%]
+tests/test_auth.py::TestAuthManager::test_auth_manager_initialization PASSED [ 30%]
+tests/test_auth.py::TestAuthManager::test_create_auth_context PASSED     [ 31%]
+tests/test_auth.py::TestAuthManager::test_get_auth_manager_singleton PASSED [ 32%]
+tests/test_auth.py::TestAuthManager::test_validate_token PASSED          [ 33%]
+tests/test_auth.py::TestAuthManager::test_generate_token PASSED          [ 34%]
+tests/test_auth.py::TestPermissionDecorators::test_require_role_decorator PASSED [ 35%]
+tests/test_auth.py::TestPermissionDecorators::test_require_permission_decorator PASSED [ 36%]
+tests/test_cli.py::TestCLIMain::test_cli_help PASSED                     [ 37%]
+tests/test_cli.py::TestCLIMain::test_cli_version PASSED                  [ 38%]
+tests/test_cli.py::TestCreateCommand::test_create_help PASSED            [ 39%]
+tests/test_cli.py::TestCreateCommand::test_create_app PASSED             [ 40%]
+tests/test_cli.py::TestInitCommand::test_init_help PASSED                [ 40%]
+tests/test_cli.py::TestInitCommand::test_init_config PASSED              [ 41%]
+tests/test_cli.py::TestAICommands::test_ai_help PASSED                   [ 42%]
+tests/test_cli.py::TestAICommands::test_ai_endpoint_help PASSED          [ 43%]
+tests/test_cli.py::TestAICommands::test_ai_providers_help PASSED         [ 44%]
+tests/test_cli.py::TestUCCommands::test_uc_help PASSED                   [ 45%]
+tests/test_cli.py::TestUCCommands::test_uc_list_catalogs_help PASSED     [ 46%]
+tests/test_cli.py::TestUCCommands::test_uc_search_help PASSED            [ 47%]
+tests/test_integration.py::TestFastAPIIntegration::test_health_endpoint PASSED [ 48%]
+tests/test_integration.py::TestFastAPIIntegration::test_uc_catalogs_endpoint PASSED [ 49%]
+tests/test_integration.py::TestCompleteWorkflows::test_data_discovery_workflow ERROR [ 50%]
+tests/test_integration.py::TestCompleteWorkflows::test_table_inspection_workflow ERROR [ 51%]
+tests/test_integration.py::TestCompleteWorkflows::test_search_and_inspect_workflow ERROR [ 52%]
+tests/test_query_builder.py::test_simple_select PASSED                   [ 53%]
+tests/test_query_builder.py::test_select_with_columns PASSED             [ 54%]
+tests/test_query_builder.py::test_select_with_where PASSED               [ 55%]
+tests/test_query_builder.py::test_select_with_join PASSED                [ 56%]
+tests/test_query_builder.py::test_select_with_group_by PASSED            [ 57%]
+tests/test_query_builder.py::test_select_with_order_by PASSED            [ 58%]
+tests/test_query_builder.py::test_select_with_limit PASSED               [ 59%]
+tests/test_query_builder.py::test_select_with_offset PASSED              [ 60%]
+tests/test_query_builder.py::test_complex_query PASSED                   [ 60%]
+tests/test_query_builder.py::test_query_params PASSED                    [ 61%]
+tests/test_query_builder.py::test_reset_builder PASSED                   [ 62%]
+tests/test_query_builder.py::test_missing_from_clause PASSED             [ 63%]
+tests/test_sdk.py::TestSDKModels::test_base_model_creation PASSED        [ 64%]
+tests/test_sdk.py::TestSDKModels::test_model_validation PASSED           [ 65%]
+tests/test_sdk.py::TestSDKModels::test_model_serialization PASSED        [ 66%]
+tests/test_sdk.py::TestQueryBuilder::test_query_builder_initialization PASSED [ 67%]
+tests/test_sdk.py::TestQueryBuilder::test_select_query PASSED            [ 68%]
+tests/test_sdk.py::TestQueryBuilder::test_select_with_columns PASSED     [ 69%]
+tests/test_sdk.py::TestQueryBuilder::test_where_clause PASSED            [ 70%]
+tests/test_sdk.py::TestQueryBuilder::test_multiple_where_clauses PASSED  [ 71%]
+tests/test_sdk.py::TestQueryBuilder::test_order_by PASSED                [ 72%]
+tests/test_sdk.py::TestQueryBuilder::test_limit PASSED                   [ 73%]
+tests/test_sdk.py::TestQueryBuilder::test_join PASSED                    [ 74%]
+tests/test_sdk.py::TestQueryBuilder::test_complex_query PASSED           [ 75%]
+tests/test_sdk.py::TestSDKUtils::test_sanitize_sql_identifier PASSED     [ 76%]
+tests/test_sdk.py::TestSDKUtils::test_format_sql_value PASSED            [ 77%]
+tests/test_sdk.py::TestSDKExceptions::test_base_exception PASSED         [ 78%]
+tests/test_sdk.py::TestSDKExceptions::test_query_execution_exception PASSED [ 79%]
+tests/test_sdk.py::TestSDKExceptions::test_validation_exception PASSED   [ 80%]
+tests/test_sdk.py::TestSDKExceptions::test_exception_inheritance PASSED  [ 80%]
+tests/test_unity_catalog.py::TestUnityCatalogModels::test_uc_catalog_model PASSED [ 81%]
+tests/test_unity_catalog.py::TestUnityCatalogModels::test_uc_schema_model PASSED [ 82%]
+tests/test_unity_catalog.py::TestUnityCatalogModels::test_uc_table_model PASSED [ 83%]
+tests/test_unity_catalog.py::TestUnityCatalogModels::test_uc_column_model PASSED [ 84%]
+tests/test_unity_catalog.py::TestUnityCatalogManagerUnit::test_list_catalogs PASSED [ 85%]
+tests/test_unity_catalog.py::TestUnityCatalogManagerUnit::test_list_schemas PASSED [ 86%]
+tests/test_unity_catalog.py::TestUnityCatalogManagerUnit::test_list_tables PASSED [ 87%]
+tests/test_unity_catalog.py::TestUnityCatalogManagerUnit::test_search_tables PASSED [ 88%]
+tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_list_catalogs_integration ERROR [ 89%]
+tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_list_schemas_integration ERROR [ 90%]
+tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_list_tables_integration ERROR [ 91%]
+tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_get_table_details_integration ERROR [ 92%]
+tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_get_table_sample_integration ERROR [ 93%]
+tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_get_table_stats_integration ERROR [ 94%]
+tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_search_tables_integration ERROR [ 95%]
+tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_get_catalog_tree_integration ERROR [ 96%]
+tests/test_unity_catalog.py::TestUnityCatalogAPI::test_list_catalogs_endpoint SKIPPED [ 97%]
+tests/test_unity_catalog.py::TestUnityCatalogAPI::test_list_schemas_endpoint SKIPPED [ 98%]
+tests/test_unity_catalog.py::TestUnityCatalogCLI::test_list_catalogs_cli PASSED [ 99%]
+tests/test_unity_catalog.py::TestUnityCatalogCLI::test_search_cli PASSED [100%]
+
+==================================== ERRORS ====================================
+_____ ERROR at setup of TestCompleteWorkflows.test_data_discovery_workflow _____
+lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:319: in _async_fixture_wrapper
+    fixture, request.instance, fixturedef.unittest
+                               ^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'FixtureDef' object has no attribute 'unittest'
+____ ERROR at setup of TestCompleteWorkflows.test_table_inspection_workflow ____
+lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:319: in _async_fixture_wrapper
+    fixture, request.instance, fixturedef.unittest
+                               ^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'FixtureDef' object has no attribute 'unittest'
+___ ERROR at setup of TestCompleteWorkflows.test_search_and_inspect_workflow ___
+lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:319: in _async_fixture_wrapper
+    fixture, request.instance, fixturedef.unittest
+                               ^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'FixtureDef' object has no attribute 'unittest'
+_ ERROR at setup of TestUnityCatalogIntegration.test_list_catalogs_integration _
+lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:319: in _async_fixture_wrapper
+    fixture, request.instance, fixturedef.unittest
+                               ^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'FixtureDef' object has no attribute 'unittest'
+_ ERROR at setup of TestUnityCatalogIntegration.test_list_schemas_integration __
+lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:319: in _async_fixture_wrapper
+    fixture, request.instance, fixturedef.unittest
+                               ^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'FixtureDef' object has no attribute 'unittest'
+__ ERROR at setup of TestUnityCatalogIntegration.test_list_tables_integration __
+lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:319: in _async_fixture_wrapper
+    fixture, request.instance, fixturedef.unittest
+                               ^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'FixtureDef' object has no attribute 'unittest'
+_ ERROR at setup of TestUnityCatalogIntegration.test_get_table_details_integration _
+lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:319: in _async_fixture_wrapper
+    fixture, request.instance, fixturedef.unittest
+                               ^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'FixtureDef' object has no attribute 'unittest'
+_ ERROR at setup of TestUnityCatalogIntegration.test_get_table_sample_integration _
+lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:319: in _async_fixture_wrapper
+    fixture, request.instance, fixturedef.unittest
+                               ^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'FixtureDef' object has no attribute 'unittest'
+_ ERROR at setup of TestUnityCatalogIntegration.test_get_table_stats_integration _
+lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:319: in _async_fixture_wrapper
+    fixture, request.instance, fixturedef.unittest
+                               ^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'FixtureDef' object has no attribute 'unittest'
+_ ERROR at setup of TestUnityCatalogIntegration.test_search_tables_integration _
+lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:319: in _async_fixture_wrapper
+    fixture, request.instance, fixturedef.unittest
+                               ^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'FixtureDef' object has no attribute 'unittest'
+_ ERROR at setup of TestUnityCatalogIntegration.test_get_catalog_tree_integration _
+lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:319: in _async_fixture_wrapper
+    fixture, request.instance, fixturedef.unittest
+                               ^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'FixtureDef' object has no attribute 'unittest'
+=================================== FAILURES ===================================
+_______________ TestDatabricksAdapterIntegration.test_connection _______________
+tests/test_adapters.py:74: in test_connection
+    result = await databricks_adapter.execute_query("SELECT 1 as test")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'async_generator' object has no attribute 'execute_query'
+_______ TestDatabricksAdapterIntegration.test_execute_query_integration ________
+tests/test_adapters.py:85: in test_execute_query_integration
+    result = await databricks_adapter.execute_query(query)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'async_generator' object has no attribute 'execute_query'
+_________ TestDatabricksAdapterIntegration.test_query_with_parameters __________
+tests/test_adapters.py:94: in test_query_with_parameters
+    result = await databricks_adapter.execute_query(query, parameters={"value": 42})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'async_generator' object has no attribute 'execute_query'
+_____________ TestTemplateProvider.test_generate_endpoint_template _____________
+tests/test_ai_scaffolding.py:72: in test_generate_endpoint_template
+    code = await provider.generate_code(
+E   TypeError: TemplateProvider.generate_code() got an unexpected keyword argument 'code_type'
+______________ TestTemplateProvider.test_generate_model_template _______________
+tests/test_ai_scaffolding.py:86: in test_generate_model_template
+    code = await provider.generate_code(
+E   TypeError: TemplateProvider.generate_code() got an unexpected keyword argument 'code_type'
+_____________ TestTemplateProvider.test_generate_service_template ______________
+tests/test_ai_scaffolding.py:98: in test_generate_service_template
+    provider = TemplateProvider()
+               ^^^^^^^^^^^^^^^^^^
+E   TypeError: BaseAIProvider.__init__() missing 1 required positional argument: 'config'
+_______________ TestAIScaffolder.test_scaffolder_initialization ________________
+tests/test_ai_scaffolding.py:120: in test_scaffolder_initialization
+    scaffolder = AIScaffolder(provider="template")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+___________________ TestAIScaffolder.test_generate_endpoint ____________________
+tests/test_ai_scaffolding.py:127: in test_generate_endpoint
+    scaffolder = AIScaffolder(provider="template")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+_____________________ TestAIScaffolder.test_generate_model _____________________
+tests/test_ai_scaffolding.py:141: in test_generate_model
+    scaffolder = AIScaffolder(provider="template")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+____________________ TestAIScaffolder.test_generate_service ____________________
+tests/test_ai_scaffolding.py:156: in test_generate_service
+    scaffolder = AIScaffolder(provider="template")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+____________________ TestAIScaffolder.test_code_validation _____________________
+tests/test_ai_scaffolding.py:169: in test_code_validation
+    scaffolder = AIScaffolder(provider="template")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+_____________________ TestAISafety.test_forbidden_patterns _____________________
+tests/test_ai_scaffolding.py:258: in test_forbidden_patterns
+    scaffolder = AIScaffolder(provider="template")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+_____________________ TestAISafety.test_code_length_limits _____________________
+tests/test_ai_scaffolding.py:273: in test_code_length_limits
+    scaffolder = AIScaffolder(provider="template")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+_____________________ TestAISafety.test_safe_code_patterns _____________________
+tests/test_ai_scaffolding.py:282: in test_safe_code_patterns
+    scaffolder = AIScaffolder(provider="template")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+=============================== warnings summary ===============================
+lakehouse_appkit/sdk/auth.py:32
+  /Users/abhishek.dey/lakehouse-appkit/lakehouse_appkit/sdk/auth.py:32: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at: datetime = datetime.utcnow()
+
+lakehouse_appkit/config.py:19
+  /Users/abhishek.dey/lakehouse-appkit/lakehouse_appkit/config.py:19: UserWarning: Field name "schema" in "DatabricksConfig" shadows an attribute in parent "BaseModel"
+    class DatabricksConfig(BaseModel):
+
+lakehouse_appkit/config.py:30
+  /Users/abhishek.dey/lakehouse-appkit/lakehouse_appkit/config.py:30: UserWarning: Field name "schema" in "UnityCatalogConfig" shadows an attribute in parent "BaseModel"
+    class UnityCatalogConfig(BaseModel):
+
+lakehouse-app/lib/python3.14/site-packages/_pytest/config/__init__.py:1428
+  /Users/abhishek.dey/lakehouse-appkit/lakehouse-app/lib/python3.14/site-packages/_pytest/config/__init__.py:1428: PytestConfigWarning: Unknown config option: asyncio_default_fixture_loop_scope
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:156: 5881 warnings
+  /Users/abhishek.dey/lakehouse-appkit/lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:156: DeprecationWarning: 'asyncio.iscoroutinefunction' is deprecated and slated for removal in Python 3.16; use inspect.iscoroutinefunction() instead
+    return asyncio.iscoroutinefunction(obj)
+
+lakehouse_appkit/sdk/models.py:32
+  /Users/abhishek.dey/lakehouse-appkit/lakehouse_appkit/sdk/models.py:32: UserWarning: Field name "schema" in "TableSchema" shadows an attribute in parent "BaseModel"
+    class TableSchema(BaseModel):
+
+tests/test_adapters.py::TestDatabricksAdapterUnit::test_execute_query_mock
+  /Users/abhishek.dey/lakehouse-appkit/tests/conftest.py:42: DeprecationWarning: 'asyncio.get_event_loop_policy' is deprecated and slated for removal in Python 3.16
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+
+tests/test_adapters.py::TestDatabricksAdapterUnit::test_execute_query_mock
+  /Users/abhishek.dey/lakehouse-appkit/lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:398: DeprecationWarning: 'asyncio.get_event_loop_policy' is deprecated and slated for removal in Python 3.16
+    policy = asyncio.get_event_loop_policy()
+
+tests/test_sdk.py::TestSDKModels::test_model_serialization
+  /Users/abhishek.dey/lakehouse-appkit/tests/test_sdk.py:68: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    data = model.dict()
+
+tests/test_sdk.py::TestSDKModels::test_model_serialization
+  /Users/abhishek.dey/lakehouse-appkit/tests/test_sdk.py:73: PydanticDeprecatedSince20: The `json` method is deprecated; use `model_dump_json` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    json_str = model.json()
+
+tests/test_unity_catalog.py::TestUnityCatalogCLI::test_search_cli
+  /Users/abhishek.dey/lakehouse-appkit/lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:444: DeprecationWarning: 'asyncio.get_event_loop_policy' is deprecated and slated for removal in Python 3.16
+    policy = asyncio.get_event_loop_policy()
+
+tests/test_unity_catalog.py::TestUnityCatalogCLI::test_search_cli
+  /Users/abhishek.dey/lakehouse-appkit/lakehouse-app/lib/python3.14/site-packages/pytest_asyncio/plugin.py:465: DeprecationWarning: 'asyncio.get_event_loop_policy' is deprecated and slated for removal in Python 3.16
+    policy = asyncio.get_event_loop_policy()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+_______________ coverage: platform darwin, python 3.14.2-final-0 _______________
+
+Name                                                Stmts   Miss  Cover   Missing
+---------------------------------------------------------------------------------
+lakehouse_appkit/__init__.py                            1      0   100%
+lakehouse_appkit/adapters/__init__.py                   0      0   100%
+lakehouse_appkit/adapters/databricks.py                84     61    27%   15-19, 66-90, 94-102, 110-137, 145-163, 167-177, 181-194, 206-216
+lakehouse_appkit/cli/__init__.py                        0      0   100%
+lakehouse_appkit/cli/commands/__init__.py               0      0   100%
+lakehouse_appkit/cli/commands/add.py                   21     21     0%   4-46
+lakehouse_appkit/cli/commands/ai.py                   163    113    31%   71-107, 136-160, 188-212, 239-263, 302-340, 346-397, 403-449
+lakehouse_appkit/cli/commands/ai_providers_cmd.py      38     38     0%   1-62
+lakehouse_appkit/cli/commands/create.py                60      4    93%   34-35, 404-405
+lakehouse_appkit/cli/commands/deploy.py                16     16     0%   4-43
+lakehouse_appkit/cli/commands/init.py                  11      2    82%   16-17
+lakehouse_appkit/cli/commands/run.py                   12     12     0%   4-30
+lakehouse_appkit/cli/commands/uc.py                   239    164    31%   31-54, 65-92, 103-130, 141-179, 191-217, 230-256, 269-293, 301-336, 346-373, 377
+lakehouse_appkit/cli/main.py                           60     14    77%   81-87, 105-111, 130-136, 149
+lakehouse_appkit/config.py                             61     10    84%   99-109, 174, 216
+lakehouse_appkit/sdk/__init__.py                        0      0   100%
+lakehouse_appkit/sdk/ai_providers.py                  139     92    34%   48, 68, 72, 94, 103-130, 137, 146-173, 180, 189-218, 236, 250, 252, 254, 258, 268-338, 357-472
+lakehouse_appkit/sdk/ai_scaffold.py                   192    146    24%   70-80, 93-114, 119-146, 160-170, 174-179, 184-195, 199-222, 227-253, 268-288, 300-309, 324-333, 347-356, 367-375, 388, 450-524, 551, 661, 712-717, 746, 804, 813, 841-849
+lakehouse_appkit/sdk/auth.py                           91     45    51%   37-39, 44, 50, 97-115, 134-143, 155-158, 183-199, 212-222, 235-245, 277-282
+lakehouse_appkit/sdk/base.py                           34     11    68%   34, 43, 61, 79, 92, 105, 119, 128, 132-133, 137
+lakehouse_appkit/sdk/exceptions.py                     16      0   100%
+lakehouse_appkit/sdk/models.py                         36      0   100%
+lakehouse_appkit/sdk/query.py                          71      1    99%   176
+lakehouse_appkit/sdk/utils.py                          63     38    40%   20-26, 40-45, 58-69, 83-92, 107-113, 127-128, 143-144, 201-205
+lakehouse_appkit/templates/__init__.py                  0      0   100%
+lakehouse_appkit/unity_catalog/__init__.py            230    113    51%   257-309, 358-361, 380-404, 426-452, 476-493, 502-535, 556-559, 578-599
+lakehouse_appkit/unity_catalog/routes.py               88     55    38%   45-49, 67-71, 93-97, 119-123, 147-151, 173-177, 199-203, 225-229, 249-253, 271-279, 293-297
+---------------------------------------------------------------------------------
+TOTAL                                                1726    956    45%
+=========================== short test summary info ============================
+FAILED tests/test_adapters.py::TestDatabricksAdapterIntegration::test_connection - AttributeError: 'async_generator' object has no attribute 'execute_query'
+FAILED tests/test_adapters.py::TestDatabricksAdapterIntegration::test_execute_query_integration - AttributeError: 'async_generator' object has no attribute 'execute_query'
+FAILED tests/test_adapters.py::TestDatabricksAdapterIntegration::test_query_with_parameters - AttributeError: 'async_generator' object has no attribute 'execute_query'
+FAILED tests/test_ai_scaffolding.py::TestTemplateProvider::test_generate_endpoint_template - TypeError: TemplateProvider.generate_code() got an unexpected keyword argument 'code_type'
+FAILED tests/test_ai_scaffolding.py::TestTemplateProvider::test_generate_model_template - TypeError: TemplateProvider.generate_code() got an unexpected keyword argument 'code_type'
+FAILED tests/test_ai_scaffolding.py::TestTemplateProvider::test_generate_service_template - TypeError: BaseAIProvider.__init__() missing 1 required positional argument: 'config'
+FAILED tests/test_ai_scaffolding.py::TestAIScaffolder::test_scaffolder_initialization - TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+FAILED tests/test_ai_scaffolding.py::TestAIScaffolder::test_generate_endpoint - TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+FAILED tests/test_ai_scaffolding.py::TestAIScaffolder::test_generate_model - TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+FAILED tests/test_ai_scaffolding.py::TestAIScaffolder::test_generate_service - TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+FAILED tests/test_ai_scaffolding.py::TestAIScaffolder::test_code_validation - TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+FAILED tests/test_ai_scaffolding.py::TestAISafety::test_forbidden_patterns - TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+FAILED tests/test_ai_scaffolding.py::TestAISafety::test_code_length_limits - TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+FAILED tests/test_ai_scaffolding.py::TestAISafety::test_safe_code_patterns - TypeError: AIScaffolder.__init__() got an unexpected keyword argument 'provider'
+ERROR tests/test_integration.py::TestCompleteWorkflows::test_data_discovery_workflow - AttributeError: 'FixtureDef' object has no attribute 'unittest'
+ERROR tests/test_integration.py::TestCompleteWorkflows::test_table_inspection_workflow - AttributeError: 'FixtureDef' object has no attribute 'unittest'
+ERROR tests/test_integration.py::TestCompleteWorkflows::test_search_and_inspect_workflow - AttributeError: 'FixtureDef' object has no attribute 'unittest'
+ERROR tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_list_catalogs_integration - AttributeError: 'FixtureDef' object has no attribute 'unittest'
+ERROR tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_list_schemas_integration - AttributeError: 'FixtureDef' object has no attribute 'unittest'
+ERROR tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_list_tables_integration - AttributeError: 'FixtureDef' object has no attribute 'unittest'
+ERROR tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_get_table_details_integration - AttributeError: 'FixtureDef' object has no attribute 'unittest'
+ERROR tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_get_table_sample_integration - AttributeError: 'FixtureDef' object has no attribute 'unittest'
+ERROR tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_get_table_stats_integration - AttributeError: 'FixtureDef' object has no attribute 'unittest'
+ERROR tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_search_tables_integration - AttributeError: 'FixtureDef' object has no attribute 'unittest'
+ERROR tests/test_unity_catalog.py::TestUnityCatalogIntegration::test_get_catalog_tree_integration - AttributeError: 'FixtureDef' object has no attribute 'unittest'
+====== 14 failed, 71 passed, 9 skipped, 5892 warnings, 11 errors in 0.57s ======
