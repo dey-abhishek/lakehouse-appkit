@@ -94,9 +94,645 @@ pip install anthropic[vertex]
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start - Create and Run Your First App
 
-### 1. Initialize Configuration
+### 1. Setup & Configuration
+
+#### Step 1.1: Install Lakehouse-AppKit
+
+```bash
+# Clone the repository
+cd /path/to/your/projects
+git clone https://github.com/yourusername/lakehouse-appkit.git
+cd lakehouse-appkit
+
+# Create and activate virtual environment
+python -m venv lakehouse-app
+source lakehouse-app/bin/activate  # On Windows: lakehouse-app\Scripts\activate
+
+# Install dependencies
+pip install -e .
+```
+
+#### Step 1.2: Configure Databricks Credentials
+
+Edit `config/.env.dev` with your Databricks credentials:
+
+```bash
+# Databricks Connection
+DATABRICKS_HOST=your-workspace.cloud.databricks.com
+DATABRICKS_TOKEN=dapi1234567890abcdef
+DATABRICKS_SQL_WAREHOUSE_ID=abc123def456
+
+# Default Unity Catalog
+DATABRICKS_CATALOG=main
+DATABRICKS_SCHEMA=default
+
+# AI Provider (optional)
+AI_ENABLED=true
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+**How to get these credentials:**
+
+1. **DATABRICKS_HOST:** Your workspace URL (without `https://`)
+   - Example: `e2-demo-field-eng.cloud.databricks.com`
+
+2. **DATABRICKS_TOKEN:** 
+   - Go to User Settings → Access Tokens
+   - Click "Generate New Token"
+   - Copy the token (starts with `dapi`)
+
+3. **DATABRICKS_SQL_WAREHOUSE_ID:**
+   - Go to SQL Warehouses in your workspace
+   - Click on a warehouse
+   - Copy the ID from the URL or Settings page
+
+---
+
+### 2. Run the Sample App (Option 1: Quick Start)
+
+The fastest way to get started is to run the included sample app:
+
+```bash
+# Make sure you're in the lakehouse-appkit directory
+cd /path/to/lakehouse-appkit
+
+# Activate virtual environment
+source lakehouse-app/bin/activate
+
+# Run the app
+python app.py
+```
+
+**Expected output:**
+```
+✅ Adapter initialized: your-workspace.cloud.databricks.com, warehouse: abc123
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+```
+
+**Access the app:**
+- **Home Page:** http://localhost:8000
+- **Interactive API Docs:** http://localhost:8000/docs
+- **Health Check:** http://localhost:8000/api/health
+
+---
+
+### 3. Create Your Own Custom App (Option 2: From Scratch)
+
+#### Step 3.1: Create a New App File
+
+Create `my_app.py`:
+
+```python
+"""
+My Custom Databricks Data Application
+"""
+from fastapi import FastAPI, HTTPException
+from lakehouse_appkit.adapters.databricks import DatabricksAdapter
+from dotenv import load_dotenv
+import os
+
+# Load configuration
+load_dotenv("config/.env.dev")
+
+# Initialize Databricks adapter
+adapter = DatabricksAdapter(
+    host=os.getenv("DATABRICKS_HOST"),
+    token=os.getenv("DATABRICKS_TOKEN"),
+    warehouse_id=os.getenv("DATABRICKS_SQL_WAREHOUSE_ID")
+)
+
+# Create FastAPI app
+app = FastAPI(
+    title="My Data App",
+    description="Custom Databricks data application",
+    version="1.0.0"
+)
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to My Data App!", "status": "running"}
+
+@app.get("/catalogs")
+async def list_catalogs():
+    """List all Unity Catalog catalogs."""
+    try:
+        await adapter.connect()
+        catalogs = await adapter.list_catalogs_rest()
+        await adapter.disconnect()
+        return {"catalogs": [c["name"] for c in catalogs]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/query")
+async def execute_query(sql: str):
+    """Execute a SQL query."""
+    try:
+        await adapter.connect()
+        results = await adapter.execute_query(sql)
+        await adapter.disconnect()
+        return {"results": results, "row_count": len(results)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+```
+
+#### Step 3.2: Run Your Custom App
+
+```bash
+python my_app.py
+```
+
+#### Step 3.3: Test Your App
+
+```bash
+# Test the root endpoint
+curl http://localhost:8000/
+
+# List catalogs
+curl http://localhost:8000/catalogs
+
+# Execute a query
+curl -X POST "http://localhost:8000/query?sql=SELECT%20current_date()"
+```
+
+---
+
+### 4. Use the Python SDK Directly (Option 3: Script Mode)
+
+#### Step 4.1: Create a Python Script
+
+Create `my_script.py`:
+
+```python
+"""
+Direct SDK usage - no FastAPI server needed
+"""
+import asyncio
+from lakehouse_appkit.adapters.databricks import DatabricksAdapter
+from dotenv import load_dotenv
+import os
+
+# Load configuration
+load_dotenv("config/.env.dev")
+
+async def main():
+    # Initialize adapter
+    adapter = DatabricksAdapter(
+        host=os.getenv("DATABRICKS_HOST"),
+        token=os.getenv("DATABRICKS_TOKEN"),
+        warehouse_id=os.getenv("DATABRICKS_SQL_WAREHOUSE_ID")
+    )
+    
+    # Connect to Databricks
+    await adapter.connect()
+    print("✅ Connected to Databricks!")
+    
+    # List catalogs
+    catalogs = await adapter.list_catalogs_rest()
+    print(f"\n📚 Found {len(catalogs)} catalogs:")
+    for catalog in catalogs[:5]:
+        print(f"  - {catalog['name']}")
+    
+    # Execute SQL query (via REST API, no SQL connector needed!)
+    results = await adapter.execute_query("SELECT current_timestamp() as now")
+    print(f"\n🔍 Query result: {results}")
+    
+    # List tables in a catalog/schema
+    tables = await adapter.list_tables_rest("main", "default")
+    print(f"\n📊 Found {len(tables)} tables in main.default")
+    
+    # Disconnect
+    await adapter.disconnect()
+    print("\n👋 Disconnected")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+#### Step 4.2: Run Your Script
+
+```bash
+python my_script.py
+```
+
+**Expected output:**
+```
+✅ Connected to Databricks!
+
+📚 Found 3309 catalogs:
+  - main
+  - my_catalog
+  - analytics_db
+
+🔍 Query result: [{'now': '2026-01-04 10:30:45'}]
+
+📊 Found 25 tables in main.default
+
+👋 Disconnected
+```
+
+---
+
+### 5. Use the Included Demo Scripts
+
+#### Run demo.py (Comprehensive Demo)
+
+```bash
+python demo.py
+```
+
+This demonstrates:
+- ✅ Connecting to Databricks
+- ✅ Listing catalogs, schemas, tables
+- ✅ Executing SQL queries via REST API
+- ✅ Parameterized queries (SQL injection protection)
+- ✅ Performance metrics
+
+#### Run client.py (HTTP Client Demo)
+
+```bash
+python client.py
+```
+
+This demonstrates:
+- ✅ Making HTTP requests to the FastAPI app
+- ✅ Health checks
+- ✅ Calling Unity Catalog endpoints
+- ✅ Error handling
+
+---
+
+### 6. Interactive Development with API Docs
+
+Once your app is running, open the interactive API documentation:
+
+```
+http://localhost:8000/docs
+```
+
+**Features:**
+- 📚 See all available endpoints
+- 🧪 Test endpoints interactively with "Try it out"
+- 📖 View request/response schemas
+- 🔧 No coding required!
+
+**How to use:**
+1. Click on any endpoint (e.g., `GET /api/unity-catalog/catalogs`)
+2. Click "Try it out"
+3. Fill in parameters (if required)
+4. Click "Execute"
+5. See the response in real-time!
+
+---
+
+## 📝 Common Use Cases
+
+### Use Case 1: Data Discovery Dashboard
+
+```python
+from fastapi import FastAPI
+from lakehouse_appkit.adapters.databricks import DatabricksAdapter
+import os
+
+app = FastAPI()
+adapter = DatabricksAdapter(...)
+
+@app.get("/discover/{catalog}")
+async def discover_catalog(catalog: str):
+    """Discover all data in a catalog."""
+    await adapter.connect()
+    
+    # Get catalog info
+    schemas = await adapter.list_schemas_rest(catalog)
+    
+    # Get table counts for each schema
+    discovery = []
+    for schema in schemas[:10]:  # First 10 schemas
+        tables = await adapter.list_tables_rest(catalog, schema["name"])
+        discovery.append({
+            "schema": schema["name"],
+            "table_count": len(tables),
+            "tables": [t["name"] for t in tables[:5]]
+        })
+    
+    await adapter.disconnect()
+    return {"catalog": catalog, "schemas": discovery}
+```
+
+### Use Case 2: SQL Query API
+
+```python
+@app.post("/analytics/query")
+async def run_analytics_query(query: str, timeout: int = 30):
+    """Execute analytics queries with timeout."""
+    await adapter.connect()
+    
+    try:
+        results = await adapter.execute_query(query)
+        return {
+            "status": "success",
+            "results": results,
+            "row_count": len(results)
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+    finally:
+        await adapter.disconnect()
+```
+
+### Use Case 3: Data Pipeline Monitor
+
+```python
+@app.get("/pipeline/status")
+async def get_pipeline_status():
+    """Monitor data pipeline tables."""
+    await adapter.connect()
+    
+    tables_to_monitor = [
+        ("main", "bronze", "raw_events"),
+        ("main", "silver", "cleaned_events"),
+        ("main", "gold", "aggregated_metrics")
+    ]
+    
+    status = []
+    for catalog, schema, table in tables_to_monitor:
+        query = f"""
+        SELECT 
+            COUNT(*) as row_count,
+            MAX(updated_at) as last_update
+        FROM {catalog}.{schema}.{table}
+        """
+        result = await adapter.execute_query(query)
+        status.append({
+            "table": f"{catalog}.{schema}.{table}",
+            "rows": result[0]["row_count"],
+            "last_update": result[0]["last_update"]
+        })
+    
+    await adapter.disconnect()
+    return {"pipeline_status": status}
+```
+
+---
+
+## 🔧 App Configuration Options
+
+### Production Configuration
+
+For production, use environment-specific configs:
+
+```bash
+# Set environment
+export APP_ENV=prod
+
+# Use production config
+python app.py
+```
+
+Configuration hierarchy:
+1. `config/.env.dev` - Development (default)
+2. `config/.env.test` - Testing
+3. `config/.env.prod` - Production
+
+### Custom Port and Host
+
+```python
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        app,
+        host="0.0.0.0",      # Listen on all interfaces
+        port=8080,           # Custom port
+        reload=True,         # Auto-reload on code changes (dev only)
+        workers=4            # Multiple workers (production)
+    )
+```
+
+### CORS Configuration
+
+```python
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://yourdomain.com"],  # Specific domains in production
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### App won't start?
+
+**Check configuration:**
+```bash
+# Verify credentials are set
+cat config/.env.dev | grep DATABRICKS
+```
+
+**Expected output:**
+```
+DATABRICKS_HOST=your-workspace.cloud.databricks.com
+DATABRICKS_TOKEN=dapi...
+DATABRICKS_SQL_WAREHOUSE_ID=abc123
+```
+
+**Test connection:**
+```bash
+python -c "
+from lakehouse_appkit.adapters.databricks import DatabricksAdapter
+from dotenv import load_dotenv
+import os, asyncio
+
+load_dotenv('config/.env.dev')
+adapter = DatabricksAdapter(
+    host=os.getenv('DATABRICKS_HOST'),
+    token=os.getenv('DATABRICKS_TOKEN'),
+    warehouse_id=os.getenv('DATABRICKS_SQL_WAREHOUSE_ID')
+)
+asyncio.run(adapter.connect())
+print('✅ Connection successful!')
+asyncio.run(adapter.disconnect())
+"
+```
+
+### Port already in use?
+
+```bash
+# Find and kill the process
+lsof -ti:8000 | xargs kill -9
+
+# Or use a different port
+python app.py --port 8080
+```
+
+### Can't connect to Databricks?
+
+1. **Check host format:** Should NOT include `https://`
+   - ✅ Good: `workspace.cloud.databricks.com`
+   - ❌ Bad: `https://workspace.cloud.databricks.com`
+
+2. **Verify token:** Generate a new token if needed
+   - Go to User Settings → Access Tokens
+   - Generate New Token
+
+3. **Check warehouse:** Verify warehouse ID is correct
+   - Go to SQL Warehouses
+   - Copy ID from warehouse details
+
+---
+
+## 📊 App Examples
+
+### Example 1: Minimal App
+
+```python
+from fastapi import FastAPI
+from lakehouse_appkit.adapters.databricks import DatabricksAdapter
+from dotenv import load_dotenv
+import os
+
+load_dotenv("config/.env.dev")
+
+app = FastAPI()
+adapter = DatabricksAdapter(
+    host=os.getenv("DATABRICKS_HOST"),
+    token=os.getenv("DATABRICKS_TOKEN"),
+    warehouse_id=os.getenv("DATABRICKS_SQL_WAREHOUSE_ID")
+)
+
+@app.get("/tables")
+async def list_tables():
+    await adapter.connect()
+    tables = await adapter.list_tables_rest("main", "default")
+    await adapter.disconnect()
+    return {"tables": [t["name"] for t in tables]}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+```
+
+### Example 2: Full-Featured App
+
+See `app.py` in the repository for a complete example with:
+- ✅ Beautiful HTML landing page
+- ✅ Health check endpoints
+- ✅ Unity Catalog operations
+- ✅ SQL query execution
+- ✅ Error handling
+- ✅ CORS configuration
+
+---
+
+## 🎯 Next Steps After Creating Your App
+
+### 1. Add More Endpoints
+
+Explore the full Lakehouse-AppKit SDK:
+- Jobs management (`lakehouse_appkit.jobs`)
+- Secrets management (`lakehouse_appkit.secrets`)
+- Model serving (`lakehouse_appkit.model_serving`)
+- Vector search (`lakehouse_appkit.vector_search`)
+- And 10+ more!
+
+### 2. Deploy Your App
+
+#### Option A: Local Development
+```bash
+python app.py
+```
+
+#### Option B: Production Server
+```bash
+gunicorn app:app -w 4 -k uvicorn.workers.UvicornWorker
+```
+
+#### Option C: Docker
+```dockerfile
+FROM python:3.9
+WORKDIR /app
+COPY . .
+RUN pip install -r requirements.txt
+CMD ["python", "app.py"]
+```
+
+### 3. Monitor Your App
+
+Add logging and monitoring:
+```python
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@app.get("/query")
+async def execute_query(sql: str):
+    logger.info(f"Executing query: {sql}")
+    # ... rest of your code
+```
+
+---
+
+## 🎊 Summary: How to Create and Run Apps
+
+### Quick Commands
+
+```bash
+# Setup (one-time)
+cd lakehouse-appkit
+python -m venv lakehouse-app
+source lakehouse-app/bin/activate
+pip install -e .
+
+# Configure (edit with your credentials)
+nano config/.env.dev
+
+# Run sample app
+python app.py
+
+# Create custom app
+# 1. Copy app.py to my_app.py
+# 2. Edit my_app.py with your logic
+# 3. Run: python my_app.py
+
+# Or use SDK directly
+python demo.py
+```
+
+### Architecture Options
+
+1. **FastAPI Server** (`app.py`) - REST API for web/mobile apps
+2. **Python Scripts** (`demo.py`) - Direct SDK usage for automation
+3. **CLI Commands** - Command-line tools for operations
+4. **Hybrid** - Combine all approaches!
+
+---
+
+**🚀 You're ready to build data applications on Databricks!**
+
+For more details, see:
+- **API Documentation:** http://localhost:8000/docs (when app is running)
+- **Examples:** See `demo.py` and `client.py`
+- **Advanced Usage:** Continue reading below
+
+---
+
+## 🔌 Advanced: Using Pre-built Routes
+
+### 1. Initialize Configuration (Alternative Method)
 
 ```bash
 lakehouse-appkit init

@@ -26,7 +26,10 @@ class TestDatabricksAdapterUnit:
             schema="default"
         )
         
-        assert adapter.host == "https://test.databricks.com"
+        # Host is normalized (https:// removed from host attribute)
+        assert adapter.host == "test.databricks.com"
+        # But workspace_url keeps it
+        assert adapter.workspace_url == "https://test.databricks.com"
         assert adapter.token == "test-token"
         assert adapter.warehouse_id == "test-warehouse"
         assert adapter.catalog == "main"
@@ -40,7 +43,9 @@ class TestDatabricksAdapterUnit:
             warehouse_id="test-warehouse"  # Still required, but can be any value
         )
         
-        assert adapter.host == "https://test.databricks.com"
+        # Host is normalized
+        assert adapter.host == "test.databricks.com"
+        assert adapter.workspace_url == "https://test.databricks.com"
         assert adapter.warehouse_id is not None
     
     @pytest.mark.asyncio
