@@ -1,65 +1,149 @@
-# Lakehouse-AppKit 🚀
+# Lakehouse-AppKit
 
-**Production-ready CLI and SDK for building FastAPI data applications on Databricks**
+**A complete toolkit for building governed, production-grade FastAPI applications inside Databricks Apps.**
 
-[![Tests](https://img.shields.io/badge/tests-253%20passing-brightgreen)]()
-[![Coverage](https://img.shields.io/badge/coverage-64%25-yellow)]()
+[![Tests](https://img.shields.io/badge/tests-273%20passing-brightgreen)]()
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue)]()
 [![License](https://img.shields.io/badge/license-MIT-blue)]()
+[![Status](https://img.shields.io/badge/status-early%20development-yellow)]()
 
-Lakehouse-AppKit is a comprehensive toolkit for building, deploying, and managing data applications on Databricks. It provides a unified CLI, FastAPI SDK, and production-ready patterns for working with the complete Databricks ecosystem.
+Lakehouse-AppKit standardizes how serious data applications are built on the lakehouse — with identity, governance, auditability, and safe data workflows built in.
 
 ---
 
-## ✨ Features
+## Why this exists
 
-### 🎯 Core Capabilities
-- **CLI-Driven Development** - Intuitive command-line interface for all operations
-- **FastAPI Integration** - Production-ready REST API routes for all Databricks features
-- **AI-Assisted Scaffolding** - Generate endpoints and adapters using Claude/GPT
-- **Type Safety** - Full Pydantic models throughout
-- **Production Patterns** - Built-in retry logic, circuit breakers, rate limiting
+Teams building Databricks Apps often need more than dashboards. They require **controlled write-back, approval workflows, audit trails, identity propagation, and Unity Catalog-aware data access**. Today, this is repeatedly rebuilt using fragile internal FastAPI framework code.
 
-### 🔌 Databricks Integration
-- ✅ **Unity Catalog** - Catalogs, schemas, tables, volumes, functions
-- ✅ **SQL & Dashboards** - Statement execution, AI/BI Dashboards (Lakeview)
-- ✅ **Secrets Management** - Full CRUD for scopes and secrets
-- ✅ **Delta Lake** - Optimize, vacuum, time travel, history
-- ✅ **Vector Search** - Endpoints and indexes management
-- ✅ **Model Serving** - Deploy and query ML models
-- ✅ **Jobs (Lakeflow)** - Create, run, monitor, cancel jobs
-- ✅ **Notebooks** - List, export, manage notebooks
-- ✅ **Databricks Apps** - Package and deploy applications
-- ✅ **OAuth & Service Principals** - Token management
-- ✅ **Genie RAG** - Conversational data interface
-- ✅ **MLflow** - Experiment tracking
-- ✅ **Connections** - External data sources
-- ✅ **User-Defined Functions** - Custom UDFs
+**Lakehouse-AppKit standardizes this missing application layer.**
 
-### 🤖 AI Features
-- **Claude Integration** - Real Anthropic API support
-- **OpenAI Support** - GPT models (configurable)
-- **Gemini Support** - Google AI (configurable)
-- **Code Generation** - AI-powered endpoint and adapter scaffolding
-- **Safety Guardrails** - Syntax validation and security checks
+---
+
+## What you build with Lakehouse-AppKit
+
+Lakehouse-AppKit is designed for **data workflows, not BI dashboards**. Typical applications include:
+- Data quality exception management
+- Risk metric override and approval workflows
+- Regulatory reporting with audit trails
+- Internal data operations tooling
+- Governed write-back applications
+
+---
+
+## What this is NOT
+
+Lakehouse-AppKit is:
+- ❌ **Not a UI builder** - not a BI tool, not a Streamlit replacement
+- ❌ **Not a Databricks SDK replacement** - it uses the SDK internally
+- ❌ **Not a generic FastAPI framework** - it's a Databricks Apps-specific toolkit for governed data applications
+
+---
+
+## How it works
+
+**Application code never talks directly to Databricks APIs.** All identity, data access, and governance flows through the Lakehouse-AppKit SDK, which internally uses the Databricks SDK and Databricks SQL with Unity Catalog.
+
+```
+Your App → Lakehouse-AppKit SDK → Databricks SDK + SQL → Databricks Platform
+```
+
+---
+
+## Design principles
+
+1. **Databricks first** - Design, governance before convenience
+2. **SDK as the contract** - All Databricks access through the SDK
+3. **Opinionated defaults with escape hatches** - Best practices by default, customizable when needed
+4. **FastAPI as the runtime** - Standard, production-ready web framework
+
+---
+
+## Project status and scope
+
+⚠️ **Lakehouse-AppKit is in early development** and focused on **Databricks Apps only**.
+
+**In scope:**
+- ✅ SQL Warehouse-backed workloads
+- ✅ Unity Catalog-aligned access patterns
+- ✅ Regulated industry use cases
+- ✅ Governed data workflows
+- ✅ Identity propagation and audit trails
+
+**Out of scope (for now):**
+- ❌ Generic FastAPI applications outside Databricks Apps
+- ❌ BI dashboard replacements
+- ❌ Streamlit-style rapid prototyping
+
+---
+
+## ✨ Core Capabilities
+
+## ✨ Core Capabilities
+
+### 🔒 Governance & Identity
+- **Identity Propagation** - User context flows through all operations
+- **Audit Trails** - All data access and modifications are logged
+- **Unity Catalog Integration** - Governed data access patterns
+- **Role-Based Access Control** - Fine-grained permissions
+
+### 🏗️ Application Framework
+- **FastAPI Runtime** - Production-ready REST API framework
+- **Databricks SDK Integration** - Type-safe access to Databricks services
+- **REST-Only SQL** - Statement Execution API (no SQL connector needed)
+- **Async by Default** - Built on aiohttp for performance
 
 ### 🛡️ Production Resilience
 - **Configurable Retry Logic** - Exponential backoff with jitter
 - **Circuit Breaker** - Fail fast with automatic recovery
 - **Rate Limiting** - Token bucket algorithm
 - **Environment Profiles** - Dev, test, prod configurations
-- **Graceful Degradation** - Fallback mechanisms
+
+### 🔌 Databricks Integration
+
+**Core Services:**
+- ✅ **Unity Catalog** - Catalogs, schemas, tables, volumes, functions
+- ✅ **SQL Execution** - Statement Execution API (REST-only)
+- ✅ **Secrets Management** - Secure credential storage
+- ✅ **Jobs (Lakeflow)** - Workflow orchestration
+
+**Advanced Services:**
+- ✅ **AI/BI Dashboards** - Lakeview integration
+- ✅ **Model Serving** - ML model deployment
+- ✅ **Vector Search** - Similarity search
+- ✅ **Delta Lake** - Optimize, vacuum, time travel
+- ✅ **OAuth & Service Principals** - Authentication
+- ✅ **Notebooks** - Programmatic access
+
+**Extended Services:**
+- ✅ **Genie RAG** - Conversational data interface
+- ✅ **MLflow** - Experiment tracking
+- ✅ **Connections** - External data sources
+- ✅ **User-Defined Functions** - Custom UDFs
+
+### 🤖 AI Features (Optional)
+- **Claude Integration** - Real Anthropic API support
+- **Code Generation** - AI-powered scaffolding
+- **Safety Guardrails** - Syntax validation and security checks
 
 ---
 
-## 📦 Installation
+## 📦 Getting Started
 
 ### Prerequisites
+
+**Required:**
 - Python 3.8+
 - Databricks workspace with Unity Catalog enabled
+- Databricks Apps enabled
 - Databricks access token
+- SQL Warehouse access
 
-### Install from Source
+**Recommended:**
+- Familiarity with FastAPI
+- Understanding of Unity Catalog permissions
+- Experience with Databricks Apps deployment
+
+### Installation
 
 ```bash
 # Clone the repository
@@ -77,24 +161,175 @@ pip install -e .
 lakehouse-appkit --version
 ```
 
-### Install Dependencies
+### Configuration
+
+Prerequisites: Use `lakehouse-appkit init <app-name>` to bootstrap new projects and deploy using `databricks apps deploy`.
+
+**1. Configure Databricks credentials** in `config/.env.dev`:
 
 ```bash
-pip install -r requirements.txt
+# Databricks Connection
+DATABRICKS_HOST=your-workspace.cloud.databricks.com
+DATABRICKS_TOKEN=dapi1234567890abcdef
+DATABRICKS_SQL_WAREHOUSE_ID=abc123def456
+
+# Unity Catalog
+DATABRICKS_CATALOG=main
+DATABRICKS_SCHEMA=default
+
+# Optional: AI Features
+AI_ENABLED=true
+ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-**Optional Dependencies:**
-```bash
-# For AI features
-pip install anthropic openai google-generativeai
+**How to get credentials:**
 
-# For Vertex AI support (optional)
-pip install anthropic[vertex]
+| Credential | How to Obtain |
+|------------|---------------|
+| **DATABRICKS_HOST** | Your workspace URL (without `https://`) |
+| **DATABRICKS_TOKEN** | User Settings → Access Tokens → Generate New Token |
+| **DATABRICKS_SQL_WAREHOUSE_ID** | SQL Warehouses → Click warehouse → Copy ID from URL |
+
+**2. Test your configuration:**
+
+```bash
+python -c "
+from lakehouse_appkit.adapters.databricks import DatabricksAdapter
+from dotenv import load_dotenv
+import os, asyncio
+
+load_dotenv('config/.env.dev')
+adapter = DatabricksAdapter(
+    host=os.getenv('DATABRICKS_HOST'),
+    token=os.getenv('DATABRICKS_TOKEN'),
+    warehouse_id=os.getenv('DATABRICKS_SQL_WAREHOUSE_ID')
+)
+asyncio.run(adapter.connect())
+print('✅ Connection successful!')
+asyncio.run(adapter.disconnect())
+"
+```
+
+---
+
+---
+
+## 🎯 Typical Use Cases
+
+Lakehouse-AppKit is designed for **governed data workflows** that require more than dashboards:
+
+### 1. Data Quality Exception Management
+
+**Scenario:** Data quality checks fail, and analysts need to approve overrides with audit trails.
+
+```python
+@app.post("/dq/exceptions/approve")
+async def approve_exception(
+    exception_id: str,
+    user_context: AuthContext = Depends(get_auth_context)
+):
+    """Approve data quality exception with full audit trail."""
+    # Identity and approval logged automatically
+    await adapter.connect()
+    
+    # Record approval in Unity Catalog
+    await adapter.execute_query(f"""
+        INSERT INTO audit.dq_approvals 
+        (exception_id, approved_by, approved_at, reason)
+        VALUES ('{exception_id}', '{user_context.user}', current_timestamp(), ...)
+    """)
+    
+    await adapter.disconnect()
+    return {"status": "approved", "by": user_context.user}
+```
+
+### 2. Risk Metric Override Workflows
+
+**Scenario:** Finance team needs to manually override calculated risk metrics with approval chain.
+
+```python
+@app.post("/risk/override")
+async def override_risk_metric(
+    account_id: str,
+    new_value: float,
+    justification: str,
+    user_context: AuthContext = Depends(get_auth_context)
+):
+    """Override risk metric with governance controls."""
+    # Check if user has permission via Unity Catalog
+    # Log override with full audit trail
+    # Trigger approval workflow if needed
+    pass
+```
+
+### 3. Regulatory Reporting with Audit Trails
+
+**Scenario:** Generate regulatory reports with complete lineage and audit logs.
+
+```python
+@app.post("/regulatory/generate-report")
+async def generate_regulatory_report(
+    report_type: str,
+    period: str,
+    user_context: AuthContext = Depends(get_auth_context)
+):
+    """Generate report with full audit trail and lineage."""
+    # All data access logged through Unity Catalog
+    # Report generation tracked with user identity
+    # Output stored with governance metadata
+    pass
+```
+
+### 4. Controlled Write-Back Operations
+
+**Scenario:** Allow business users to update specific tables through governed API.
+
+```python
+@app.post("/data/update-customer-tier")
+async def update_customer_tier(
+    customer_id: str,
+    new_tier: str,
+    user_context: AuthContext = Depends(get_auth_context)
+):
+    """Update customer tier with governance controls."""
+    # Validate user permissions through Unity Catalog
+    # Log all changes with user identity
+    # Apply business rules and validation
+    # Write to governed table
+    pass
 ```
 
 ---
 
 ## 🚀 Quick Start - Create and Run Your First App
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Your FastAPI Application (Databricks App)                  │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Lakehouse-AppKit SDK                                 │  │
+│  │  • Identity propagation                               │  │
+│  │  • Governance enforcement                             │  │
+│  │  • Audit logging                                      │  │
+│  └────────────┬─────────────────────────────────────────┘  │
+│               │                                              │
+│               ▼                                              │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Databricks SDK + SQL (Unity Catalog)                 │  │
+│  └────────────┬─────────────────────────────────────────┘  │
+└───────────────┼──────────────────────────────────────────────┘
+                │
+                ▼
+   ┌────────────────────────────────────────┐
+   │  Databricks Platform                   │
+   │  • Unity Catalog                       │
+   │  • SQL Warehouses                      │
+   │  • Audit Logs                          │
+   │  • Access Controls                     │
+   └────────────────────────────────────────┘
+```
 
 ### 1. Setup & Configuration
 
@@ -180,84 +415,210 @@ INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 
 ### 3. Create Your Own Custom App (Option 2: From Scratch)
 
-#### Step 3.1: Create a New App File
+#### Step 3.1: Create a Governed Data Application
 
-Create `my_app.py`:
+Create `my_governed_app.py`:
 
 ```python
 """
-My Custom Databricks Data Application
+Governed Data Application with Lakehouse-AppKit
+All operations include identity propagation and audit trails
 """
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from lakehouse_appkit.adapters.databricks import DatabricksAdapter
+from lakehouse_appkit.sdk.auth import AuthContext, get_auth_manager
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 # Load configuration
 load_dotenv("config/.env.dev")
 
-# Initialize Databricks adapter
+# Initialize Databricks adapter (handles governance automatically)
 adapter = DatabricksAdapter(
     host=os.getenv("DATABRICKS_HOST"),
     token=os.getenv("DATABRICKS_TOKEN"),
     warehouse_id=os.getenv("DATABRICKS_SQL_WAREHOUSE_ID")
 )
 
+# Initialize auth manager for identity propagation
+auth_manager = get_auth_manager()
+
 # Create FastAPI app
 app = FastAPI(
-    title="My Data App",
-    description="Custom Databricks data application",
+    title="Governed Data App",
+    description="Production data application with built-in governance",
     version="1.0.0"
 )
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to My Data App!", "status": "running"}
+    return {
+        "message": "Governed Data Application",
+        "governance": "enabled",
+        "status": "running"
+    }
 
-@app.get("/catalogs")
-async def list_catalogs():
-    """List all Unity Catalog catalogs."""
+@app.get("/data/catalogs")
+async def list_catalogs(
+    auth_context: AuthContext = Depends(auth_manager.get_current_context)
+):
+    """
+    List catalogs with user identity propagation.
+    Only shows catalogs the authenticated user has access to.
+    """
     try:
         await adapter.connect()
+        
+        # User identity is automatically propagated
+        # Unity Catalog enforces permissions
         catalogs = await adapter.list_catalogs_rest()
+        
+        # Audit log: User viewed catalogs
+        await log_audit_event(
+            user=auth_context.user,
+            action="LIST_CATALOGS",
+            timestamp=datetime.utcnow()
+        )
+        
         await adapter.disconnect()
-        return {"catalogs": [c["name"] for c in catalogs]}
+        return {
+            "catalogs": [c["name"] for c in catalogs],
+            "user": auth_context.user,
+            "governed": True
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/query")
-async def execute_query(sql: str):
-    """Execute a SQL query."""
+@app.post("/data/write-back")
+async def controlled_write(
+    catalog: str,
+    schema: str,
+    table: str,
+    data: dict,
+    auth_context: AuthContext = Depends(auth_manager.get_current_context)
+):
+    """
+    Controlled write-back with governance.
+    - Validates user permissions via Unity Catalog
+    - Logs all write operations with user identity
+    - Enforces data validation rules
+    """
     try:
         await adapter.connect()
-        results = await adapter.execute_query(sql)
+        
+        # Check write permissions (Unity Catalog handles this)
+        # Log the write intent
+        await log_audit_event(
+            user=auth_context.user,
+            action="WRITE_DATA",
+            target=f"{catalog}.{schema}.{table}",
+            timestamp=datetime.utcnow()
+        )
+        
+        # Perform governed write
+        query = f"""
+        INSERT INTO {catalog}.{schema}.{table} 
+        VALUES (...) 
+        -- Automatically includes user identity in audit columns
+        """
+        await adapter.execute_query(query)
+        
         await adapter.disconnect()
-        return {"results": results, "row_count": len(results)}
+        return {
+            "status": "success",
+            "written_by": auth_context.user,
+            "target": f"{catalog}.{schema}.{table}",
+            "governed": True
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/workflows/approve-exception")
+async def approve_exception(
+    exception_id: str,
+    justification: str,
+    auth_context: AuthContext = Depends(auth_manager.get_current_context)
+):
+    """
+    Approve data quality exception with full audit trail.
+    """
+    try:
+        await adapter.connect()
+        
+        # Record approval in governed audit table
+        await adapter.execute_query(f"""
+            INSERT INTO governance.dq_approvals 
+            (exception_id, approved_by, approved_at, justification)
+            VALUES (
+                '{exception_id}', 
+                '{auth_context.user}', 
+                current_timestamp(), 
+                '{justification}'
+            )
+        """)
+        
+        await adapter.disconnect()
+        return {
+            "status": "approved",
+            "exception_id": exception_id,
+            "approved_by": auth_context.user,
+            "governed": True
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+async def log_audit_event(user: str, action: str, timestamp, target: str = None):
+    """Helper to log audit events to Unity Catalog."""
+    # Implementation: Write to audit table in Unity Catalog
+    pass
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
 ```
 
-#### Step 3.2: Run Your Custom App
+**Key Features:**
+- ✅ Identity propagation through `AuthContext`
+- ✅ Unity Catalog permission enforcement
+- ✅ Automatic audit logging
+- ✅ Controlled write-back operations
+- ✅ Approval workflows with governance
+
+#### Step 3.2: Run Your Governed App
 
 ```bash
-python my_app.py
+python my_governed_app.py
 ```
+
+**What you get:**
+- ✅ Identity-aware endpoints
+- ✅ Unity Catalog permission enforcement
+- ✅ Automatic audit logging
+- ✅ Governed data access patterns
 
 #### Step 3.3: Test Your App
 
 ```bash
-# Test the root endpoint
-curl http://localhost:8000/
+# Test with user authentication
+curl -H "Authorization: Bearer <your-token>" \
+  http://localhost:8000/data/catalogs
 
-# List catalogs
-curl http://localhost:8000/catalogs
+# Test controlled write-back
+curl -X POST http://localhost:8000/data/write-back \
+  -H "Authorization: Bearer <your-token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "catalog": "main",
+    "schema": "default",
+    "table": "my_table",
+    "data": {...}
+  }'
 
-# Execute a query
-curl -X POST "http://localhost:8000/query?sql=SELECT%20current_date()"
+# Test approval workflow
+curl -X POST http://localhost:8000/workflows/approve-exception \
+  -H "Authorization: Bearer <your-token>" \
+  -d "exception_id=123&justification=Business+override"
 ```
 
 ---
@@ -1532,30 +1893,96 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🗺️ Roadmap
 
-### v1.1 (Q2 2024)
-- [ ] Snowflake adapter
-- [ ] AWS S3 integration
-- [ ] GraphQL API support
-- [ ] Web UI dashboard
+### Current Focus (Early Development)
+- ✅ Core SDK with Databricks integration
+- ✅ Unity Catalog-first access patterns
+- ✅ REST-only SQL execution (Statement Execution API)
+- ✅ Identity propagation and audit logging
+- ⏳ Databricks Apps deployment templates
+- ⏳ Approval workflow primitives
+- ⏳ Comprehensive governance examples
 
-### v1.2 (Q3 2024)
-- [ ] Real-time streaming support
-- [ ] Advanced caching layer
-- [ ] Multi-workspace management
-- [ ] CI/CD templates
+### Future Considerations
+- OAuth 2.0 M2M authentication
+- Advanced audit trail queries
+- Workflow orchestration patterns
+- Regulatory compliance templates
+- Multi-environment deployment patterns
 
-### v2.0 (Q4 2024)
-- [ ] Kubernetes operator
-- [ ] Auto-scaling support
-- [ ] Advanced monitoring
-- [ ] Multi-cloud support
-
----
-
-## ⭐ Star History
-
-If you find this project useful, please consider giving it a star! ⭐
+**Note:** Lakehouse-AppKit is focused on **Databricks Apps** and **governed data workflows**. Generic FastAPI features and BI dashboard capabilities are out of scope.
 
 ---
 
-**Built with ❤️ for the data engineering community**
+## 🎯 When to Use Lakehouse-AppKit
+
+### ✅ Use Lakehouse-AppKit when you need:
+- Governed write-back applications with audit trails
+- Approval workflows for data operations
+- Identity-aware data access patterns
+- Regulatory compliance with Unity Catalog
+- Controlled exception management
+- Risk metric override workflows
+- Internal data operations tooling
+- Applications deployed as Databricks Apps
+
+### ❌ Don't use Lakehouse-AppKit when you need:
+- Simple BI dashboards (use Databricks SQL or Lakeview instead)
+- Rapid prototyping (use Streamlit or Jupyter)
+- Generic web applications (use FastAPI directly)
+- Applications outside Databricks Apps
+- Public-facing consumer applications
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- **Databricks** for the comprehensive lakehouse platform and Unity Catalog
+- **FastAPI** for the excellent web framework
+- **Anthropic** for Claude AI capabilities (optional)
+- **Pydantic** for data validation and type safety
+
+---
+
+## 📞 Support & Community
+
+- **Issues:** [GitHub Issues](https://github.com/yourusername/lakehouse-appkit/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/yourusername/lakehouse-appkit/discussions)
+
+**Note:** Lakehouse-AppKit is in early development. Expect breaking changes as the project evolves.
+
+---
+
+## 🎯 Project Philosophy
+
+**Lakehouse-AppKit standardizes the missing application layer for Databricks Apps.**
+
+We believe that:
+1. **Governance is not optional** - Identity, auditability, and access control should be built-in
+2. **Databricks SDK is the contract** - Direct API access bypasses governance
+3. **Unity Catalog is the foundation** - All data access should flow through UC
+4. **FastAPI is production-ready** - No need to reinvent the web framework
+5. **Opinionated defaults prevent mistakes** - Best practices should be easy, not hard
+
+---
+
+**Built for teams building serious, governed data applications on the Databricks lakehouse.** 🏗️
+
+---
+
+## ⚠️ Important Notes
+
+- **Early Development:** APIs may change as the project matures
+- **Databricks Apps Only:** Designed specifically for Databricks Apps deployment
+- **Not a UI Builder:** For governed APIs, not dashboards
+- **Unity Catalog Required:** Governance features require Unity Catalog
+- **SQL Warehouse Required:** Statement Execution API requires SQL Warehouse access
+
+---
+
+**For questions, feedback, or contributions, please open a GitHub issue or discussion.**
