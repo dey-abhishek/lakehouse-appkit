@@ -7,7 +7,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue)]()
 [![Status](https://img.shields.io/badge/status-early%20development-yellow)]()
 
-Lakehouse-AppKit standardizes how serious data applications are built on the lakehouse — with identity, governance, auditability, and safe data workflows built in.
+Lakehouse-AppKit standardizes how serious data applications are built on the Databricks Platform — with identity, governance, auditability, and safe data workflows built in.
 
 ---
 
@@ -34,7 +34,7 @@ Lakehouse-AppKit is designed for **data workflows, not BI dashboards**. Typical 
 
 Lakehouse-AppKit is:
 - ❌ **Not a UI builder** - not a BI tool, not a Streamlit replacement
-- ❌ **Not a Databricks SDK replacement** - it uses the SDK internally
+- ❌ **Not a Databricks SDK replacement** - it uses the SDK and Rest APIs internally
 - ❌ **Not a generic FastAPI framework** - it's a Databricks Apps-specific toolkit for governed data applications
 
 ---
@@ -44,7 +44,7 @@ Lakehouse-AppKit is:
 **Application code never talks directly to Databricks APIs.** All identity, data access, and governance flows through the Lakehouse-AppKit SDK, which internally uses the Databricks SDK and Databricks SQL with Unity Catalog.
 
 ```
-Your App → Lakehouse-AppKit SDK → Databricks SDK + SQL → Databricks Platform
+Your App → Lakehouse-AppKit SDK → Databricks SDK/Rest APIs → Databricks Platform
 ```
 
 ---
