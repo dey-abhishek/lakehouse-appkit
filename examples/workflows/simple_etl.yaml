@@ -1,0 +1,84 @@
+# Simple ETL Workflow Example
+# Basic data transformation workflow
+
+name: simple_etl
+version: "1.0"
+description: Simple ETL workflow demonstrating basic features
+
+catalog: main
+schema: default
+warehouse_id: ${DATABRICKS_SQL_WAREHOUSE_ID}
+
+governance:
+  require_approval: false
+  audit_table: main.audit.workflow_runs
+
+steps:
+  # Extract
+  - name: extract_source_data
+    type: sql
+    description: Extract data from source
+    query: >
+      CREATE OR REPLACE TEMP VIEW source_view AS
+      SELECT * FROM ${catalog}.bronze.raw_events
+      WHERE date = current_date()
+
+  # Transform
+  - name: transform_data
+    type: sql
+    description: Apply transformations
+    depends_on:
+      - extract_source_data
+    query: >
+      CREATE OR REPLACE TABLE ${catalog}.silver.cleaned_events AS
+      SELECT 
+        event_id,
+        user_id,
+        UPPER(event_type) as event_type,
+        event_timestamp,
+        CAST(event_value AS DOUBLE) as event_value
+      FROM source_view
+      WHERE event_value IS NOT NULL
+
+  # Validate
+  - name: validate_output
+    type: validation
+    description: Validate transformed data
+    depends_on:
+      - transform_data
+    validation_query: >
+      SELECT COUNT(*) as row_count
+      FROM ${catalog}.silver.cleaned_events
+    on_failure: fail
+
+  # Load
+  - name: load_to_gold
+    type: sql
+    description: Aggregate and load to gold layer
+    depends_on:
+      - validate_output
+    query: >
+      CREATE OR REPLACE TABLE ${catalog}.gold.event_summary AS
+      SELECT 
+        event_type,
+        COUNT(*) as event_count,
+        SUM(event_value) as total_value,
+        current_date() as summary_date
+      FROM ${catalog}.silver.cleaned_events
+      GROUP BY event_type
+
+  # Optimize
+  - name: optimize_gold_table
+    type: delta
+    description: Optimize the gold table
+    depends_on:
+      - load_to_gold
+    operation: optimize
+    table: ${catalog}.gold.event_summary
+    on_failure: continue
+
+owner: data_engineering@company.com
+tags:
+  - etl
+  - daily
+

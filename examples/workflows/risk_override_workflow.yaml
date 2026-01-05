@@ -1,0 +1,152 @@
+# Risk Metric Override Workflow
+# Governed workflow for overriding risk metrics with approval
+
+name: risk_metric_override
+version: "1.0"
+description: >
+  Approval workflow for risk metric overrides.
+  Requires dual approval and maintains complete audit trail.
+
+catalog: main
+schema: risk_management
+warehouse_id: ${DATABRICKS_SQL_WAREHOUSE_ID}
+
+# Strong governance controls
+governance:
+  require_approval: true
+  approvers:
+    - risk_manager@company.com
+    - compliance_officer@company.com
+  audit_table: main.audit.risk_overrides
+  notification_emails:
+    - risk_team@company.com
+    - audit_team@company.com
+
+steps:
+  # Step 1: Validate override request
+  - name: validate_override_request
+    type: validation
+    description: Validate that override request is within acceptable bounds
+    validation_query: >
+      SELECT 
+        CASE 
+          WHEN new_value BETWEEN current_value * 0.8 AND current_value * 1.2 
+          THEN 1 
+          ELSE 0 
+        END as is_valid
+      FROM ${catalog}.${schema}.override_requests
+      WHERE request_id = '${request_id}'
+    expected_result:
+      is_valid: 1
+    on_failure: fail
+    timeout_seconds: 30
+
+  # Step 2: First approval
+  - name: request_risk_manager_approval
+    type: approval
+    description: First approval from Risk Manager
+    depends_on:
+      - validate_override_request
+    approver: risk_manager@company.com
+    approval_message: >
+      Risk metric override requested for ${entity_name}.
+      Current value: ${current_value}
+      New value: ${new_value}
+      Reason: ${override_reason}
+      
+      Approve override?
+    require_approval: true
+
+  # Step 3: Second approval (compliance)
+  - name: request_compliance_approval
+    type: approval
+    description: Second approval from Compliance Officer
+    depends_on:
+      - request_risk_manager_approval
+    approver: compliance_officer@company.com
+    approval_message: >
+      Risk metric override approved by Risk Manager.
+      Compliance review required.
+      
+      Entity: ${entity_name}
+      Override: ${current_value} → ${new_value}
+      
+      Approve for compliance?
+    require_approval: true
+
+  # Step 4: Apply override
+  - name: apply_override
+    type: sql
+    description: Apply the approved override
+    depends_on:
+      - request_compliance_approval
+    query: >
+      UPDATE ${catalog}.${schema}.risk_metrics
+      SET 
+        metric_value = ${new_value},
+        previous_value = ${current_value},
+        override_applied = TRUE,
+        override_reason = '${override_reason}',
+        approved_by_risk = '${risk_approver}',
+        approved_by_compliance = '${compliance_approver}',
+        applied_at = current_timestamp(),
+        applied_by = '${user}'
+      WHERE entity_id = '${entity_id}'
+        AND metric_name = '${metric_name}'
+    log_result: true
+    on_failure: fail
+    retry_count: 3
+
+  # Step 5: Create audit record
+  - name: create_audit_record
+    type: sql
+    description: Create detailed audit record
+    depends_on:
+      - apply_override
+    query: >
+      INSERT INTO ${catalog}.audit.risk_overrides
+      (
+        request_id, entity_id, metric_name, 
+        previous_value, new_value, override_reason,
+        risk_approver, compliance_approver, applied_by,
+        applied_at, workflow_id
+      )
+      VALUES (
+        '${request_id}', '${entity_id}', '${metric_name}',
+        ${current_value}, ${new_value}, '${override_reason}',
+        '${risk_approver}', '${compliance_approver}', '${user}',
+        current_timestamp(), '${execution_id}'
+      )
+    log_result: true
+    on_failure: fail
+
+  # Step 6: Validate post-override
+  - name: validate_post_override
+    type: validation
+    description: Verify override was applied correctly
+    depends_on:
+      - apply_override
+    validation_query: >
+      SELECT metric_value
+      FROM ${catalog}.${schema}.risk_metrics
+      WHERE entity_id = '${entity_id}'
+        AND metric_name = '${metric_name}'
+    expected_result:
+      metric_value: ${new_value}
+    on_failure: fail
+
+  # Step 7: Notify stakeholders
+  - name: notify_stakeholders
+    type: notify
+    description: Send notifications to all stakeholders
+    depends_on:
+      - create_audit_record
+      - validate_post_override
+
+owner: risk_engineering_team@company.com
+tags:
+  - risk-management
+  - governed
+  - approval-required
+  - audit-trail
+

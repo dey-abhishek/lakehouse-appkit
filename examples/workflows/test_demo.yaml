@@ -1,0 +1,62 @@
+# Test Workflow - Simple Demo
+# This workflow demonstrates basic features without requiring existing tables
+
+name: test_demo
+version: "1.0"
+description: Simple test workflow demonstrating YAML workflow features
+
+catalog: main
+schema: default
+warehouse_id: ${DATABRICKS_SQL_WAREHOUSE_ID}
+
+governance:
+  require_approval: false
+  audit_table: main.audit.workflow_runs
+
+steps:
+  # Step 1: Simple query to test connection
+  - name: test_connection
+    type: sql
+    description: Test database connection
+    query: SELECT current_timestamp() as execution_time, 'Workflow started!' as message
+    log_result: true
+    on_failure: fail
+
+  # Step 2: Parameterized query
+  - name: test_parameters
+    type: sql
+    description: Test parameter substitution
+    depends_on:
+      - test_connection
+    query: SELECT 1 as test_number, 'Hello from YAML workflow' as greeting
+    log_result: true
+    on_failure: fail
+
+  # Step 3: Validation step
+  - name: validate_results
+    type: validation
+    description: Validate that query returns results
+    depends_on:
+      - test_parameters
+    validation_query: SELECT COUNT(*) as count FROM (SELECT 1)
+    on_failure: fail
+
+  # Step 4: Final status
+  - name: completion_status
+    type: sql
+    description: Mark workflow as complete
+    depends_on:
+      - validate_results
+    query: >
+      SELECT 
+        'completed' as status,
+        current_timestamp() as completed_at,
+        'All steps executed successfully' as message
+    log_result: true
+    on_failure: continue
+
+owner: test_user@company.com
+tags:
+  - test
+  - demo
+

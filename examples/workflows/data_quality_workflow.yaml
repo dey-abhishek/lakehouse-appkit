@@ -1,0 +1,155 @@
+# Data Quality Workflow
+# Validates and processes data quality exceptions
+
+name: data_quality_validation
+version: "1.0"
+description: >
+  Governed workflow for data quality exception management.
+  Validates data, identifies exceptions, and routes for approval.
+
+# Unity Catalog settings
+catalog: main
+schema: data_quality
+warehouse_id: ${DATABRICKS_SQL_WAREHOUSE_ID}
+
+# Governance settings
+governance:
+  require_approval: true
+  approvers:
+    - data_steward@company.com
+    - compliance_team@company.com
+  audit_table: main.audit.workflow_executions
+  notification_emails:
+    - data_ops@company.com
+
+# Workflow steps
+steps:
+  # Step 1: Validate source data
+  - name: validate_source_data
+    type: validation
+    description: Check that source data meets quality thresholds
+    validation_query: >
+      SELECT 
+        COUNT(*) as row_count,
+        COUNT(DISTINCT customer_id) as unique_customers,
+        SUM(CASE WHEN amount < 0 THEN 1 ELSE 0 END) as negative_amounts
+      FROM ${catalog}.${schema}.source_data
+      WHERE date = current_date()
+    expected_result:
+      negative_amounts: 0
+    on_failure: fail
+    timeout_seconds: 60
+
+  # Step 2: Identify exceptions
+  - name: identify_exceptions
+    type: sql
+    description: Find data quality exceptions
+    depends_on:
+      - validate_source_data
+    query: >
+      CREATE OR REPLACE TABLE ${catalog}.${schema}.dq_exceptions AS
+      SELECT 
+        transaction_id,
+        customer_id,
+        amount,
+        'NEGATIVE_AMOUNT' as exception_type,
+        current_timestamp() as identified_at
+      FROM ${catalog}.${schema}.source_data
+      WHERE amount < 0
+        AND date = current_date()
+    log_result: true
+    on_failure: fail
+
+  # Step 3: Check exception count
+  - name: check_exception_count
+    type: sql
+    description: Count exceptions found
+    depends_on:
+      - identify_exceptions
+    query: >
+      SELECT COUNT(*) as exception_count
+      FROM ${catalog}.${schema}.dq_exceptions
+    log_result: true
+
+  # Step 4: Request approval if exceptions found
+  - name: request_exception_approval
+    type: approval
+    description: Request approval to process exceptions
+    depends_on:
+      - check_exception_count
+    approver: data_steward@company.com
+    approval_message: >
+      ${exception_count} data quality exceptions found.
+      Approve to proceed with exception handling?
+    require_approval: true
+
+  # Step 5: Apply corrections
+  - name: apply_corrections
+    type: sql
+    description: Apply approved corrections to exceptions
+    depends_on:
+      - request_exception_approval
+    query: >
+      UPDATE ${catalog}.${schema}.source_data
+      SET 
+        amount = ABS(amount),
+        corrected = TRUE,
+        corrected_at = current_timestamp()
+      WHERE transaction_id IN (
+        SELECT transaction_id 
+        FROM ${catalog}.${schema}.dq_exceptions
+      )
+    log_result: true
+    on_failure: fail
+
+  # Step 6: Log to audit table
+  - name: log_audit
+    type: sql
+    description: Record workflow execution in audit log
+    depends_on:
+      - apply_corrections
+    query: >
+      INSERT INTO ${catalog}.audit.dq_workflow_log
+      (workflow_name, execution_id, exceptions_found, exceptions_corrected, executed_by, executed_at)
+      VALUES (
+        '${workflow_name}',
+        '${execution_id}',
+        ${exception_count},
+        ${exception_count},
+        '${user}',
+        current_timestamp()
+      )
+    log_result: true
+    on_failure: continue
+
+  # Step 7: Optimize target table
+  - name: optimize_table
+    type: delta
+    description: Optimize the corrected table
+    depends_on:
+      - apply_corrections
+    operation: optimize
+    table: ${catalog}.${schema}.source_data
+    on_failure: continue
+
+  # Step 8: Send notification
+  - name: send_notification
+    type: notify
+    description: Notify stakeholders of completion
+    depends_on:
+      - log_audit
+    on_failure: continue
+
+# Schedule (optional)
+schedule:
+  enabled: true
+  cron: "0 6 * * *"  # Daily at 6 AM
+  timezone: "America/New_York"
+
+# Metadata
+owner: data_engineering_team@company.com
+tags:
+  - data-quality
+  - governed
+  - daily
+

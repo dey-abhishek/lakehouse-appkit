@@ -91,6 +91,7 @@ Your App → Lakehouse-AppKit SDK → Databricks SDK/Rest APIs → Databricks Pl
 - **Databricks SDK Integration** - Type-safe access to Databricks services
 - **REST-Only SQL** - Statement Execution API (no SQL connector needed)
 - **Async by Default** - Built on aiohttp for performance
+- **YAML Workflows** - Declarative, governed data workflows
 
 ### 🛡️ Production Resilience
 - **Configurable Retry Logic** - Exponential backoff with jitter
@@ -137,6 +138,10 @@ Your App → Lakehouse-AppKit SDK → Databricks SDK/Rest APIs → Databricks Pl
 - Databricks Apps enabled
 - Databricks access token
 - SQL Warehouse access
+
+**For Deployment:**
+- Databricks CLI: `pip install databricks-cli`
+- Workspace Admin or App Creator permissions
 
 **Recommended:**
 - Familiarity with FastAPI

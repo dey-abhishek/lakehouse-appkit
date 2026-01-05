@@ -1,0 +1,71 @@
+# Databricks App Configuration
+# This file defines how your app is deployed to Databricks Apps
+
+resources:
+  # SQL Warehouse for query execution
+  - name: lakehouse_appkit_warehouse
+    type: sql-warehouse
+    description: SQL Warehouse for Lakehouse-AppKit
+    
+  # Secrets scope for credentials
+  - name: lakehouse-appkit-secrets
+    type: secret-scope
+    description: Secrets for Lakehouse-AppKit
+    
+  # Unity Catalog volumes for workflows
+  - name: workflow_definitions
+    type: volume
+    catalog: main
+    schema: workflows
+    description: Storage for YAML workflow definitions
+
+# App configuration
+app:
+  name: lakehouse-appkit
+  description: Production-ready toolkit for building governed data applications
+  
+  # Entry point
+  command:
+    - python
+    - app.py
+  
+  # Environment variables
+  env:
+    - name: DATABRICKS_HOST
+      value: "{{workspace.host}}"
+    - name: DATABRICKS_TOKEN
+      valueFrom:
+        secretKeyRef:
+          scope: lakehouse-appkit-secrets
+          key: databricks_token
+    - name: DATABRICKS_SQL_WAREHOUSE_ID
+      value: "{{resources.lakehouse_appkit_warehouse.id}}"
+    - name: APP_ENV
+      value: prod
+  
+  # Resource requirements
+  resources:
+    limits:
+      cpu: "2"
+      memory: "4Gi"
+    requests:
+      cpu: "1"
+      memory: "2Gi"
+  
+  # Port configuration
+  port: 8000
+  
+  # Health check
+  healthCheck:
+    path: /api/health
+    port: 8000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  
+  # Permissions
+  permissions:
+    - level: CAN_MANAGE
+      group_name: admins
+    - level: CAN_VIEW
+      group_name: users
+
